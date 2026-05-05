@@ -1,6 +1,7 @@
 package com.ruta_ya.controller;
 
 import com.ruta_ya.dto.CreateVehiculoRequest;
+import com.ruta_ya.dto.UpdateVehiculoRequest;
 import com.ruta_ya.dto.VehiculoResponse;
 import com.ruta_ya.service.VehiculoService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,20 @@ public class VehiculoController {
             VehiculoResponse vehiculo = vehiculoService.getVehiculoByPlaca(placa);
             if (vehiculo != null) {
                 return ResponseEntity.ok(vehiculo);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vehículo no encontrado");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{placa}")
+    public ResponseEntity<String> updateVehiculo(@PathVariable String placa, @RequestBody UpdateVehiculoRequest request) {
+        try {
+            boolean updated = vehiculoService.updateVehiculo(placa, request);
+            if (updated) {
+                return ResponseEntity.ok("Vehículo actualizado exitosamente");
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vehículo no encontrado");
         } catch (Exception e) {

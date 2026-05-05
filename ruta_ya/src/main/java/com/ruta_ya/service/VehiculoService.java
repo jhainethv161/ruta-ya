@@ -1,6 +1,7 @@
 package com.ruta_ya.service;
 
 import com.ruta_ya.dto.CreateVehiculoRequest;
+import com.ruta_ya.dto.UpdateVehiculoRequest;
 import com.ruta_ya.dto.VehiculoResponse;
 import com.ruta_ya.repository.VehiculoRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,16 @@ public class VehiculoService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al obtener el vehículo");
+        }
+    }
+
+    public boolean updateVehiculo(String placa, UpdateVehiculoRequest request) {
+        try {
+            int rows = vehiculoRepository.update(placa, request);
+            return rows > 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al actualizar el vehículo");
         }
     }
 }
