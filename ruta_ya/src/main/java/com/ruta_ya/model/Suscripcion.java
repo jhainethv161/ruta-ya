@@ -14,13 +14,6 @@ public class Suscripcion {
     @Column(name = "codigo", nullable = false)
     private Integer id;
 
-    @Column(name = "nombre", nullable = false, length = 100)
-    private String nombre;
-
-    @Lob
-    @Column(name = "descripcion")
-    private String descripcion;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_tipo", nullable = false)
     private TipoSuscripcion idTipo;

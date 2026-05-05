@@ -6,8 +6,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-
 @Getter
 @Setter
 @Entity
@@ -19,10 +17,6 @@ public class Conductor {
 
     @Column(name = "ubicacion_actual")
     private String ubicacionActual;
-
-    @ColumnDefault("1")
-    @Column(name = "disponible", nullable = false)
-    private Boolean disponible;
 
 
 }

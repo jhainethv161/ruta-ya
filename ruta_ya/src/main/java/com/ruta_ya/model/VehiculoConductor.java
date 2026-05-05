@@ -22,5 +22,8 @@ public class VehiculoConductor {
     @JoinColumn(name = "placa_vehiculo", nullable = false)
     private Vehiculo placaVehiculo;
 
+    @Column(name = "disponible", nullable = false)
+    private Boolean disponible;
+
 
 }
