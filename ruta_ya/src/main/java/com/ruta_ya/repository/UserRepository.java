@@ -1,9 +1,13 @@
 package com.ruta_ya.repository;
 
 import com.ruta_ya.dto.CreateUserRequest;
+import com.ruta_ya.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Repository
@@ -15,6 +19,27 @@ public class UserRepository {
                                  id_estado, id_metodo_pago_pref)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
+
+    private static final String SELECT_ALL_USERS = """
+            SELECT cedula, primer_nombre, segundo_nombre, primer_apellido,
+                   segundo_apellido, correo, fecha_nacimiento,
+                   id_estado, id_metodo_pago_pref
+            FROM USUARIO
+            """;
+
+    private static final RowMapper<UserResponse> USER_ROW_MAPPER = (rs, rowNum) -> {
+        UserResponse user = new UserResponse();
+        user.setCedula(rs.getString("cedula"));
+        user.setPrimerNombre(rs.getString("primer_nombre"));
+        user.setSegundoNombre(rs.getString("segundo_nombre"));
+        user.setPrimerApellido(rs.getString("primer_apellido"));
+        user.setSegundoApellido(rs.getString("segundo_apellido"));
+        user.setCorreo(rs.getString("correo"));
+        user.setFechaNacimiento(rs.getDate("fecha_nacimiento").toLocalDate());
+        user.setIdEstado(rs.getInt("id_estado"));
+        user.setIdMetodoPagoPref(rs.getInt("id_metodo_pago_pref"));
+        return user;
+    };
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -31,5 +56,9 @@ public class UserRepository {
                 request.getIdEstado(),
                 request.getIdMetodoPagoPref()
         );
+    }
+
+    public List<UserResponse> findAll() {
+        return jdbcTemplate.query(SELECT_ALL_USERS, USER_ROW_MAPPER);
     }
 }
