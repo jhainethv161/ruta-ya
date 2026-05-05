@@ -2,7 +2,9 @@ package com.ruta_ya.repository;
 
 import com.ruta_ya.dto.ViajeResponse;
 import com.ruta_ya.model.Viaje;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -40,4 +42,9 @@ public interface ViajeRepository extends JpaRepository<Viaje, Integer> {
         WHERE codigo = :codigo
     """, nativeQuery = true)
     ViajeResponse findByCodigo(@Param("codigo") Integer codigo);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE VIAJE SET id_estado = 5 WHERE codigo = :codigo", nativeQuery = true)
+    int cancelar(@Param("codigo") Integer codigo);
 }

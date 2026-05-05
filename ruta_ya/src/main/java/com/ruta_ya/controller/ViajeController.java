@@ -16,6 +16,20 @@ public class ViajeController {
 
     private final ViajeService viajeService;
 
+    @DeleteMapping("/{codigo}")
+    public ResponseEntity<String> cancelarViaje(@PathVariable Integer codigo) {
+        try {
+            boolean cancelado = viajeService.cancelarViaje(codigo);
+            if (cancelado) {
+                return ResponseEntity.ok("Viaje cancelado exitosamente");
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Viaje no encontrado");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/{codigo}")
     public ResponseEntity<?> getViajeByCodigo(@PathVariable Integer codigo) {
         try {

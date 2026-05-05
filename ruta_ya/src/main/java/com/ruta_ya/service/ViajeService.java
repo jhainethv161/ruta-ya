@@ -30,4 +30,14 @@ public class ViajeService {
             throw new RuntimeException("Error al obtener el viaje");
         }
     }
+
+    public boolean cancelarViaje(Integer codigo) {
+        try {
+            int rows = viajeRepository.cancelar(codigo);
+            return rows > 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al cancelar el viaje");
+        }
+    }
 }
