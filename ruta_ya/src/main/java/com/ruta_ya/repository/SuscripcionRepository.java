@@ -1,6 +1,7 @@
 package com.ruta_ya.repository;
 
 import com.ruta_ya.dto.CreateSuscripcionRequest;
+import com.ruta_ya.dto.UpdateSuscripcionRequest;
 import com.ruta_ya.dto.SuscripcionResponse;
 import com.ruta_ya.model.Suscripcion;
 import jakarta.transaction.Transactional;
@@ -32,4 +33,15 @@ public interface SuscripcionRepository extends JpaRepository<Suscripcion, Intege
 
     @Query(value = "SELECT codigo, id_tipo AS idTipo, id_estado AS idEstado, cedula_usuario AS cedulaUsuario FROM SUSCRIPCION WHERE cedula_usuario = :cedula", nativeQuery = true)
     List<SuscripcionResponse> findByCedulaUsuario(@Param("cedula") String cedula);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        UPDATE SUSCRIPCION
+        SET id_tipo = :#{#req.idTipo},
+            id_estado = :#{#req.idEstado},
+            cedula_usuario = :#{#req.cedulaUsuario}
+        WHERE codigo = :codigo
+    """, nativeQuery = true)
+    int update(@Param("codigo") Integer codigo, @Param("req") UpdateSuscripcionRequest req);
 }

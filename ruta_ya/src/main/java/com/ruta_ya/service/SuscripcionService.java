@@ -1,6 +1,7 @@
 package com.ruta_ya.service;
 
 import com.ruta_ya.dto.CreateSuscripcionRequest;
+import com.ruta_ya.dto.UpdateSuscripcionRequest;
 import com.ruta_ya.dto.SuscripcionResponse;
 import com.ruta_ya.repository.SuscripcionRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,16 @@ public class SuscripcionService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al obtener las suscripciones del usuario");
+        }
+    }
+
+    public boolean updateSuscripcion(Integer codigo, UpdateSuscripcionRequest request) {
+        try {
+            int rows = suscripcionRepository.update(codigo, request);
+            return rows > 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al actualizar la suscripción");
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.ruta_ya.controller;
 
 import com.ruta_ya.dto.CreateSuscripcionRequest;
+import com.ruta_ya.dto.UpdateSuscripcionRequest;
 import com.ruta_ya.dto.SuscripcionResponse;
 import com.ruta_ya.service.SuscripcionService;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,20 @@ public class SuscripcionController {
         try {
             List<SuscripcionResponse> suscripciones = suscripcionService.getAllSuscripciones();
             return ResponseEntity.ok(suscripciones);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{codigo}")
+    public ResponseEntity<String> updateSuscripcion(@PathVariable Integer codigo, @RequestBody UpdateSuscripcionRequest request) {
+        try {
+            boolean updated = suscripcionService.updateSuscripcion(codigo, request);
+            if (updated) {
+                return ResponseEntity.ok("Suscripción actualizada exitosamente");
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Suscripción no encontrada");
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
