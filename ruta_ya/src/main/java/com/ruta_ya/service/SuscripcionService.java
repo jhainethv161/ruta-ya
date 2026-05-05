@@ -32,4 +32,13 @@ public class SuscripcionService {
             throw new RuntimeException("Error al obtener las suscripciones");
         }
     }
+
+    public List<SuscripcionResponse> getSuscripcionesByCedula(String cedula) {
+        try {
+            return suscripcionRepository.findByCedulaUsuario(cedula);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al obtener las suscripciones del usuario");
+        }
+    }
 }

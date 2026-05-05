@@ -29,4 +29,7 @@ public interface SuscripcionRepository extends JpaRepository<Suscripcion, Intege
 
     @Query(value = "SELECT codigo, id_tipo AS idTipo, id_estado AS idEstado, cedula_usuario AS cedulaUsuario FROM SUSCRIPCION", nativeQuery = true)
     List<SuscripcionResponse> getAll();
+
+    @Query(value = "SELECT codigo, id_tipo AS idTipo, id_estado AS idEstado, cedula_usuario AS cedulaUsuario FROM SUSCRIPCION WHERE cedula_usuario = :cedula", nativeQuery = true)
+    List<SuscripcionResponse> findByCedulaUsuario(@Param("cedula") String cedula);
 }

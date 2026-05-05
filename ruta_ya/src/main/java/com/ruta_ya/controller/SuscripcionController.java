@@ -41,4 +41,15 @@ public class SuscripcionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @GetMapping("/usuario/{cedula}")
+    public ResponseEntity<?> getSuscripcionesByCedula(@PathVariable String cedula) {
+        try {
+            List<SuscripcionResponse> suscripciones = suscripcionService.getSuscripcionesByCedula(cedula);
+            return ResponseEntity.ok(suscripciones);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }
