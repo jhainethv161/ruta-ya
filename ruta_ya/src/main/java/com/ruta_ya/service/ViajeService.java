@@ -21,4 +21,13 @@ public class ViajeService {
             throw new RuntimeException("Error al obtener los viajes");
         }
     }
+
+    public ViajeResponse getViajeByCodigo(Integer codigo) {
+        try {
+            return viajeRepository.findByCodigo(codigo);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al obtener el viaje");
+        }
+    }
 }

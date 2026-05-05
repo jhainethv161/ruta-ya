@@ -16,6 +16,20 @@ public class ViajeController {
 
     private final ViajeService viajeService;
 
+    @GetMapping("/{codigo}")
+    public ResponseEntity<?> getViajeByCodigo(@PathVariable Integer codigo) {
+        try {
+            ViajeResponse viaje = viajeService.getViajeByCodigo(codigo);
+            if (viaje != null) {
+                return ResponseEntity.ok(viaje);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Viaje no encontrado");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @GetMapping
     public ResponseEntity<?> getAllViajes() {
         try {
