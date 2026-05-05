@@ -32,4 +32,13 @@ public class VehiculoService {
             throw new RuntimeException("Error al obtener los vehículos");
         }
     }
+
+    public VehiculoResponse getVehiculoByPlaca(String placa) {
+        try {
+            return vehiculoRepository.findByPlaca(placa);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al obtener el vehículo");
+        }
+    }
 }

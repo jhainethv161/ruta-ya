@@ -30,4 +30,7 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, String> {
 
     @Query(value = "SELECT placa, modelo, id_marca AS idMarca, id_tipo AS idTipo FROM VEHICULO", nativeQuery = true)
     List<VehiculoResponse> getAll();
+
+    @Query(value = "SELECT placa, modelo, id_marca AS idMarca, id_tipo AS idTipo FROM VEHICULO WHERE placa = :placa", nativeQuery = true)
+    VehiculoResponse findByPlaca(@Param("placa") String placa);
 }

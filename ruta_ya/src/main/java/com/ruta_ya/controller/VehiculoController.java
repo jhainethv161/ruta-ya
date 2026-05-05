@@ -28,6 +28,20 @@ public class VehiculoController {
         }
     }
 
+    @GetMapping("/{placa}")
+    public ResponseEntity<?> getVehiculoByPlaca(@PathVariable String placa) {
+        try {
+            VehiculoResponse vehiculo = vehiculoService.getVehiculoByPlaca(placa);
+            if (vehiculo != null) {
+                return ResponseEntity.ok(vehiculo);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vehículo no encontrado");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @PostMapping
     public ResponseEntity<String> createVehiculo(@RequestBody CreateVehiculoRequest request) {
         try {
