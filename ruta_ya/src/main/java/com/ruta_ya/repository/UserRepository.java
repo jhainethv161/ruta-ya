@@ -37,6 +37,12 @@ public class UserRepository {
             WHERE cedula = ?
             """;
 
+    private static final String DEACTIVATE_USER = """
+            UPDATE USUARIO
+            SET id_estado = 2
+            WHERE cedula = ?
+            """;
+
     private static final String SELECT_USER_BY_CEDULA = """
             SELECT cedula, primer_nombre, segundo_nombre, primer_apellido,
                    segundo_apellido, correo, fecha_nacimiento,
@@ -83,6 +89,10 @@ public class UserRepository {
     public Optional<UserResponse> findByCedula(String cedula) {
         List<UserResponse> results = jdbcTemplate.query(SELECT_USER_BY_CEDULA, USER_ROW_MAPPER, cedula);
         return results.stream().findFirst();
+    }
+
+    public int deactivate(String cedula) {
+        return jdbcTemplate.update(DEACTIVATE_USER, cedula);
     }
 
     public int update(String cedula, UpdateUserRequest request) {

@@ -44,6 +44,16 @@ public class UserService {
         }
     }
 
+    public boolean deactivateUser(String cedula) {
+        try {
+            int rows = userRepository.deactivate(cedula);
+            return rows > 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al eliminar el usuario");
+        }
+    }
+
     public boolean updateUser(String cedula, UpdateUserRequest request) {
         try {
             int rows = userRepository.update(cedula, request);

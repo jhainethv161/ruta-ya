@@ -58,6 +58,20 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/{cedula}")
+    public ResponseEntity<String> deleteUser(@PathVariable String cedula) {
+        try {
+            boolean deactivated = userService.deactivateUser(cedula);
+            if (deactivated) {
+                return ResponseEntity.ok("Usuario eliminado exitosamente");
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/{cedula}")
     public ResponseEntity<?> getUserByCedula(@PathVariable String cedula) {
         try {
