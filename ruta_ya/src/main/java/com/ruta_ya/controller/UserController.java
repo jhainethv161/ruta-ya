@@ -75,9 +75,9 @@ public class UserController {
     @GetMapping("/{cedula}")
     public ResponseEntity<?> getUserByCedula(@PathVariable String cedula) {
         try {
-            Optional<UserResponse> user = userService.getUserByCedula(cedula);
-            if (user.isPresent()) {
-                return ResponseEntity.ok(user.get());
+            UserResponse user = userService.getUserByCedula(cedula);
+            if (user != null) {
+                return ResponseEntity.ok(user);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
         } catch (Exception e) {

@@ -28,14 +28,14 @@ public class UserService {
 
     public List<UserResponse> getAllUsers() {
         try {
-            return userRepository.findAll();
+            return userRepository.getAll();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al obtener los usuarios");
         }
     }
 
-    public Optional<UserResponse> getUserByCedula(String cedula) {
+    public UserResponse getUserByCedula(String cedula) {
         try {
             return userRepository.findByCedula(cedula);
         } catch (Exception e) {
