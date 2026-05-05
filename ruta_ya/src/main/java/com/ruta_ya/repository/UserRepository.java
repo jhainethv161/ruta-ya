@@ -1,6 +1,7 @@
 package com.ruta_ya.repository;
 
 import com.ruta_ya.dto.CreateUserRequest;
+import com.ruta_ya.dto.UpdateUserRequest;
 import com.ruta_ya.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,6 +27,14 @@ public class UserRepository {
                    segundo_apellido, correo, fecha_nacimiento,
                    id_estado, id_metodo_pago_pref
             FROM USUARIO
+            """;
+
+    private static final String UPDATE_USER = """
+            UPDATE USUARIO
+            SET primer_nombre = ?, segundo_nombre = ?, primer_apellido = ?,
+                segundo_apellido = ?, correo = ?, contrasena = ?,
+                fecha_nacimiento = ?, id_estado = ?, id_metodo_pago_pref = ?
+            WHERE cedula = ?
             """;
 
     private static final String SELECT_USER_BY_CEDULA = """
@@ -74,5 +83,20 @@ public class UserRepository {
     public Optional<UserResponse> findByCedula(String cedula) {
         List<UserResponse> results = jdbcTemplate.query(SELECT_USER_BY_CEDULA, USER_ROW_MAPPER, cedula);
         return results.stream().findFirst();
+    }
+
+    public int update(String cedula, UpdateUserRequest request) {
+        return jdbcTemplate.update(UPDATE_USER,
+                request.getPrimerNombre(),
+                request.getSegundoNombre(),
+                request.getPrimerApellido(),
+                request.getSegundoApellido(),
+                request.getCorreo(),
+                request.getContrasena(),
+                request.getFechaNacimiento(),
+                request.getIdEstado(),
+                request.getIdMetodoPagoPref(),
+                cedula
+        );
     }
 }

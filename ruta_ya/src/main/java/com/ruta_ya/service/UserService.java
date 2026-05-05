@@ -1,6 +1,7 @@
 package com.ruta_ya.service;
 
 import com.ruta_ya.dto.CreateUserRequest;
+import com.ruta_ya.dto.UpdateUserRequest;
 import com.ruta_ya.dto.UserResponse;
 import com.ruta_ya.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,16 @@ public class UserService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al obtener el usuario");
+        }
+    }
+
+    public boolean updateUser(String cedula, UpdateUserRequest request) {
+        try {
+            int rows = userRepository.update(cedula, request);
+            return rows > 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al actualizar el usuario");
         }
     }
 }
