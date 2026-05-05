@@ -52,4 +52,14 @@ public class SuscripcionService {
             throw new RuntimeException("Error al actualizar la suscripción");
         }
     }
+
+    public boolean deleteSuscripcion(Integer codigo) {
+        try {
+            int rows = suscripcionRepository.delete(codigo);
+            return rows > 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al eliminar la suscripción");
+        }
+    }
 }

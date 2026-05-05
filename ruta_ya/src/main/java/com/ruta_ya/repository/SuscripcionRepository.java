@@ -44,4 +44,9 @@ public interface SuscripcionRepository extends JpaRepository<Suscripcion, Intege
         WHERE codigo = :codigo
     """, nativeQuery = true)
     int update(@Param("codigo") Integer codigo, @Param("req") UpdateSuscripcionRequest req);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM SUSCRIPCION WHERE codigo = :codigo", nativeQuery = true)
+    int delete(@Param("codigo") Integer codigo);
 }
