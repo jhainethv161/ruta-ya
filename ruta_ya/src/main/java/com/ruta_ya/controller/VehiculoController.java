@@ -1,11 +1,14 @@
 package com.ruta_ya.controller;
 
 import com.ruta_ya.dto.CreateVehiculoRequest;
+import com.ruta_ya.dto.VehiculoResponse;
 import com.ruta_ya.service.VehiculoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/vehiculos")
@@ -13,6 +16,17 @@ import org.springframework.web.bind.annotation.*;
 public class VehiculoController {
 
     private final VehiculoService vehiculoService;
+
+    @GetMapping
+    public ResponseEntity<?> getAllVehiculos() {
+        try {
+            List<VehiculoResponse> vehiculos = vehiculoService.getAllVehiculos();
+            return ResponseEntity.ok(vehiculos);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
     @PostMapping
     public ResponseEntity<String> createVehiculo(@RequestBody CreateVehiculoRequest request) {

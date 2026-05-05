@@ -1,6 +1,7 @@
 package com.ruta_ya.repository;
 
 import com.ruta_ya.dto.CreateVehiculoRequest;
+import com.ruta_ya.dto.VehiculoResponse;
 import com.ruta_ya.model.Vehiculo;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface VehiculoRepository extends JpaRepository<Vehiculo, String> {
@@ -24,4 +27,7 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, String> {
         )
     """, nativeQuery = true)
     int create(@Param("req") CreateVehiculoRequest req);
+
+    @Query(value = "SELECT placa, modelo, id_marca AS idMarca, id_tipo AS idTipo FROM VEHICULO", nativeQuery = true)
+    List<VehiculoResponse> getAll();
 }
