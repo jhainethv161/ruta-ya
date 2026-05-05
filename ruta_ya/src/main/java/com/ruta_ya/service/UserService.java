@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +31,15 @@ public class UserService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al obtener los usuarios");
+        }
+    }
+
+    public Optional<UserResponse> getUserByCedula(String cedula) {
+        try {
+            return userRepository.findByCedula(cedula);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al obtener el usuario");
         }
     }
 }

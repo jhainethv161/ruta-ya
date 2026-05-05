@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
@@ -25,6 +26,14 @@ public class UserRepository {
                    segundo_apellido, correo, fecha_nacimiento,
                    id_estado, id_metodo_pago_pref
             FROM USUARIO
+            """;
+
+    private static final String SELECT_USER_BY_CEDULA = """
+            SELECT cedula, primer_nombre, segundo_nombre, primer_apellido,
+                   segundo_apellido, correo, fecha_nacimiento,
+                   id_estado, id_metodo_pago_pref
+            FROM USUARIO
+            WHERE cedula = ?
             """;
 
     private static final RowMapper<UserResponse> USER_ROW_MAPPER = (rs, rowNum) -> {
@@ -60,5 +69,10 @@ public class UserRepository {
 
     public List<UserResponse> findAll() {
         return jdbcTemplate.query(SELECT_ALL_USERS, USER_ROW_MAPPER);
+    }
+
+    public Optional<UserResponse> findByCedula(String cedula) {
+        List<UserResponse> results = jdbcTemplate.query(SELECT_USER_BY_CEDULA, USER_ROW_MAPPER, cedula);
+        return results.stream().findFirst();
     }
 }
