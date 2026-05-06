@@ -5,6 +5,7 @@ import com.ruta_ya.dto.MarcaResponse;
 import com.ruta_ya.dto.MetodoPagoResponse;
 import com.ruta_ya.dto.CiudadResponse;
 import com.ruta_ya.dto.EstadoSuscripcionResponse;
+import com.ruta_ya.dto.EstadoViajeResponse;
 import com.ruta_ya.dto.TipoSuscripcionResponse;
 import com.ruta_ya.dto.TipoVehiculoResponse;
 import com.ruta_ya.service.CatalogoService;
@@ -92,6 +93,17 @@ public class CatalogoController {
         try {
             List<CiudadResponse> ciudades = catalogoService.getAllCiudades();
             return ResponseEntity.ok(ciudades);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/estados-viaje")
+    public ResponseEntity<?> getAllEstadosViaje() {
+        try {
+            List<EstadoViajeResponse> estados = catalogoService.getAllEstadosViaje();
+            return ResponseEntity.ok(estados);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

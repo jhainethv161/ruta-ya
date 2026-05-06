@@ -5,10 +5,12 @@ import com.ruta_ya.dto.MarcaResponse;
 import com.ruta_ya.dto.MetodoPagoResponse;
 import com.ruta_ya.dto.CiudadResponse;
 import com.ruta_ya.dto.EstadoSuscripcionResponse;
+import com.ruta_ya.dto.EstadoViajeResponse;
 import com.ruta_ya.dto.TipoSuscripcionResponse;
 import com.ruta_ya.dto.TipoVehiculoResponse;
 import com.ruta_ya.repository.CiudadRepository;
 import com.ruta_ya.repository.EstadoSuscripcionRepository;
+import com.ruta_ya.repository.EstadoViajeRepository;
 import com.ruta_ya.repository.EstadoUsuarioRepository;
 import com.ruta_ya.repository.MarcaRepository;
 import com.ruta_ya.repository.MetodoPagoRepository;
@@ -30,6 +32,7 @@ public class CatalogoService {
     private final TipoSuscripcionRepository tipoSuscripcionRepository;
     private final EstadoSuscripcionRepository estadoSuscripcionRepository;
     private final CiudadRepository ciudadRepository;
+    private final EstadoViajeRepository estadoViajeRepository;
 
     public List<EstadoUsuarioResponse> getAllEstadosUsuario() {
         try {
@@ -91,6 +94,15 @@ public class CatalogoService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al obtener las ciudades");
+        }
+    }
+
+    public List<EstadoViajeResponse> getAllEstadosViaje() {
+        try {
+            return estadoViajeRepository.getAll();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al obtener los estados de viaje");
         }
     }
 }
