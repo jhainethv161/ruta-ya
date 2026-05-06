@@ -1,0 +1,878 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Ruta Ya API",
+    "description": "API REST para la plataforma de transporte Ruta Ya",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Servidor de desarrollo"
+    }
+  ],
+  "tags": [
+    { "name": "Usuarios",      "description": "Gestión de usuarios" },
+    { "name": "Suscripciones", "description": "Gestión de suscripciones" },
+    { "name": "Vehículos",     "description": "Gestión de vehículos" },
+    { "name": "Viajes",        "description": "Gestión de viajes" },
+    { "name": "Catálogo",      "description": "Datos de referencia (estados, tipos, marcas, etc.)" }
+  ],
+  "paths": {
+
+    "/usuarios": {
+      "post": {
+        "tags": ["Usuarios"],
+        "summary": "Crear usuario",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateUserRequest" },
+              "example": {
+                "cedula": "1234567890",
+                "primerNombre": "Juan",
+                "segundoNombre": "Carlos",
+                "primerApellido": "Pérez",
+                "segundoApellido": "García",
+                "correo": "juan.perez@email.com",
+                "contrasena": "password123",
+                "fechaNacimiento": "1990-05-15",
+                "idEstado": 1,
+                "idMetodoPagoPref": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Usuario creado exitosamente", "content": { "application/json": { "example": "Usuario creado exitosamente" } } },
+          "500": { "description": "Error interno del servidor" }
+        }
+      },
+      "get": {
+        "tags": ["Usuarios"],
+        "summary": "Obtener todos los usuarios",
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/UserResponse" } },
+                "example": [
+                  {
+                    "cedula": "1234567890",
+                    "primerNombre": "Juan",
+                    "segundoNombre": "Carlos",
+                    "primerApellido": "Pérez",
+                    "segundoApellido": "García",
+                    "correo": "juan.perez@email.com",
+                    "fechaNacimiento": "1990-05-15",
+                    "idEstado": 1,
+                    "idMetodoPagoPref": 1
+                  }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/usuarios/{cedula}": {
+      "get": {
+        "tags": ["Usuarios"],
+        "summary": "Obtener usuario por cédula",
+        "parameters": [
+          { "name": "cedula", "in": "path", "required": true, "schema": { "type": "string" }, "example": "1234567890" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponse" },
+                "example": {
+                  "cedula": "1234567890",
+                  "primerNombre": "Juan",
+                  "segundoNombre": "Carlos",
+                  "primerApellido": "Pérez",
+                  "segundoApellido": "García",
+                  "correo": "juan.perez@email.com",
+                  "fechaNacimiento": "1990-05-15",
+                  "idEstado": 1,
+                  "idMetodoPagoPref": 1
+                }
+              }
+            }
+          },
+          "404": { "description": "Usuario no encontrado" },
+          "500": { "description": "Error interno del servidor" }
+        }
+      },
+      "put": {
+        "tags": ["Usuarios"],
+        "summary": "Actualizar usuario",
+        "parameters": [
+          { "name": "cedula", "in": "path", "required": true, "schema": { "type": "string" }, "example": "1234567890" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserRequest" },
+              "example": {
+                "primerNombre": "Juan",
+                "segundoNombre": "Carlos",
+                "primerApellido": "Pérez",
+                "segundoApellido": "García",
+                "correo": "juan.actualizado@email.com",
+                "contrasena": "nuevaPassword123",
+                "fechaNacimiento": "1990-05-15",
+                "idEstado": 1,
+                "idMetodoPagoPref": 2
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Usuario actualizado exitosamente", "content": { "application/json": { "example": "Usuario actualizado exitosamente" } } },
+          "404": { "description": "Usuario no encontrado" },
+          "500": { "description": "Error interno del servidor" }
+        }
+      },
+      "delete": {
+        "tags": ["Usuarios"],
+        "summary": "Desactivar usuario (eliminación lógica)",
+        "description": "Cambia el id_estado del usuario a 2 (Inactivo). No elimina el registro.",
+        "parameters": [
+          { "name": "cedula", "in": "path", "required": true, "schema": { "type": "string" }, "example": "1234567890" }
+        ],
+        "responses": {
+          "200": { "description": "Usuario eliminado exitosamente", "content": { "application/json": { "example": "Usuario eliminado exitosamente" } } },
+          "404": { "description": "Usuario no encontrado" },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/suscripciones": {
+      "post": {
+        "tags": ["Suscripciones"],
+        "summary": "Crear suscripción",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateSuscripcionRequest" },
+              "example": {
+                "idTipo": 1,
+                "idEstado": 1,
+                "cedulaUsuario": "1234567890"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Suscripción creada exitosamente", "content": { "application/json": { "example": "Suscripción creada exitosamente" } } },
+          "500": { "description": "Error interno del servidor" }
+        }
+      },
+      "get": {
+        "tags": ["Suscripciones"],
+        "summary": "Obtener todas las suscripciones",
+        "responses": {
+          "200": {
+            "description": "Lista de suscripciones",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/SuscripcionResponse" } },
+                "example": [
+                  { "codigo": 1, "idTipo": 1, "idEstado": 1, "cedulaUsuario": "1234567890" },
+                  { "codigo": 2, "idTipo": 2, "idEstado": 1, "cedulaUsuario": "9876543210" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/suscripciones/usuario/{cedula}": {
+      "get": {
+        "tags": ["Suscripciones"],
+        "summary": "Obtener suscripciones por cédula de usuario",
+        "parameters": [
+          { "name": "cedula", "in": "path", "required": true, "schema": { "type": "string" }, "example": "1234567890" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de suscripciones del usuario (puede estar vacía)",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/SuscripcionResponse" } },
+                "example": [
+                  { "codigo": 1, "idTipo": 1, "idEstado": 1, "cedulaUsuario": "1234567890" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/suscripciones/{codigo}": {
+      "put": {
+        "tags": ["Suscripciones"],
+        "summary": "Actualizar suscripción",
+        "parameters": [
+          { "name": "codigo", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateSuscripcionRequest" },
+              "example": {
+                "idTipo": 2,
+                "idEstado": 1,
+                "cedulaUsuario": "1234567890"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Suscripción actualizada exitosamente", "content": { "application/json": { "example": "Suscripción actualizada exitosamente" } } },
+          "404": { "description": "Suscripción no encontrada" },
+          "500": { "description": "Error interno del servidor" }
+        }
+      },
+      "delete": {
+        "tags": ["Suscripciones"],
+        "summary": "Eliminar suscripción",
+        "description": "Elimina físicamente el registro de la base de datos.",
+        "parameters": [
+          { "name": "codigo", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": {
+          "200": { "description": "Suscripción eliminada exitosamente", "content": { "application/json": { "example": "Suscripción eliminada exitosamente" } } },
+          "404": { "description": "Suscripción no encontrada" },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/vehiculos": {
+      "post": {
+        "tags": ["Vehículos"],
+        "summary": "Crear vehículo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateVehiculoRequest" },
+              "example": {
+                "placa": "ABC123",
+                "modelo": "Corolla 2022",
+                "idMarca": 1,
+                "idTipo": 2
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Vehículo creado exitosamente", "content": { "application/json": { "example": "Vehículo creado exitosamente" } } },
+          "500": { "description": "Error interno del servidor" }
+        }
+      },
+      "get": {
+        "tags": ["Vehículos"],
+        "summary": "Obtener todos los vehículos",
+        "responses": {
+          "200": {
+            "description": "Lista de vehículos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/VehiculoResponse" } },
+                "example": [
+                  { "placa": "ABC123", "modelo": "Corolla 2022", "idMarca": 1, "idTipo": 2 },
+                  { "placa": "XYZ789", "modelo": "Civic 2021",   "idMarca": 3, "idTipo": 2 }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/vehiculos/{placa}": {
+      "get": {
+        "tags": ["Vehículos"],
+        "summary": "Obtener vehículo por placa",
+        "parameters": [
+          { "name": "placa", "in": "path", "required": true, "schema": { "type": "string" }, "example": "ABC123" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehículo encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VehiculoResponse" },
+                "example": { "placa": "ABC123", "modelo": "Corolla 2022", "idMarca": 1, "idTipo": 2 }
+              }
+            }
+          },
+          "404": { "description": "Vehículo no encontrado" },
+          "500": { "description": "Error interno del servidor" }
+        }
+      },
+      "put": {
+        "tags": ["Vehículos"],
+        "summary": "Actualizar vehículo",
+        "parameters": [
+          { "name": "placa", "in": "path", "required": true, "schema": { "type": "string" }, "example": "ABC123" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateVehiculoRequest" },
+              "example": {
+                "modelo": "Corolla 2024",
+                "idMarca": 1,
+                "idTipo": 2
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Vehículo actualizado exitosamente", "content": { "application/json": { "example": "Vehículo actualizado exitosamente" } } },
+          "404": { "description": "Vehículo no encontrado" },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/viajes": {
+      "post": {
+        "tags": ["Viajes"],
+        "summary": "Crear viaje",
+        "description": "Inserta las direcciones de origen y destino, luego crea el viaje. La fecha_hora se asigna automáticamente con la fecha actual del sistema.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateViajeRequest" },
+              "example": {
+                "valorEstimado": 25000.00,
+                "idEstado": 1,
+                "cedulaUsuario": "1234567890",
+                "cedulaConductor": "9876543210",
+                "placaVehiculo": "ABC123",
+                "direccionOrigen": {
+                  "direccion": "Calle 10 #5-23",
+                  "descripcion": "Frente al parque central",
+                  "codigoCiudad": "MED"
+                },
+                "direccionDestino": {
+                  "direccion": "Carrera 45 #80-12",
+                  "descripcion": "Entrada principal del centro comercial",
+                  "codigoCiudad": "MED"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Viaje creado exitosamente", "content": { "application/json": { "example": "Viaje creado exitosamente" } } },
+          "500": { "description": "Error interno del servidor" }
+        }
+      },
+      "get": {
+        "tags": ["Viajes"],
+        "summary": "Obtener todos los viajes",
+        "responses": {
+          "200": {
+            "description": "Lista de viajes",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ViajeResponse" } },
+                "example": [
+                  {
+                    "codigo": 1,
+                    "fechaHora": "2024-03-15T14:30:00Z",
+                    "valorEstimado": 25000.00,
+                    "idEstado": 1,
+                    "idDireccionOrigen": 3,
+                    "idDireccionDestino": 7,
+                    "cedulaUsuario": "1234567890",
+                    "cedulaConductor": "9876543210",
+                    "placaVehiculo": "ABC123"
+                  }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/viajes/{codigo}": {
+      "get": {
+        "tags": ["Viajes"],
+        "summary": "Obtener viaje por código",
+        "parameters": [
+          { "name": "codigo", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Viaje encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ViajeResponse" },
+                "example": {
+                  "codigo": 1,
+                  "fechaHora": "2024-03-15T14:30:00Z",
+                  "valorEstimado": 25000.00,
+                  "idEstado": 1,
+                  "idDireccionOrigen": 3,
+                  "idDireccionDestino": 7,
+                  "cedulaUsuario": "1234567890",
+                  "cedulaConductor": "9876543210",
+                  "placaVehiculo": "ABC123"
+                }
+              }
+            }
+          },
+          "404": { "description": "Viaje no encontrado" },
+          "500": { "description": "Error interno del servidor" }
+        }
+      },
+      "put": {
+        "tags": ["Viajes"],
+        "summary": "Actualizar viaje",
+        "description": "Actualiza los datos del viaje y las direcciones de origen y destino existentes. No modifica la fecha_hora.",
+        "parameters": [
+          { "name": "codigo", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateViajeRequest" },
+              "example": {
+                "valorEstimado": 30000.00,
+                "idEstado": 2,
+                "cedulaUsuario": "1234567890",
+                "cedulaConductor": "9876543210",
+                "placaVehiculo": "ABC123",
+                "direccionOrigen": {
+                  "direccion": "Calle 10 #5-23",
+                  "descripcion": "Frente al parque central",
+                  "codigoCiudad": "MED"
+                },
+                "direccionDestino": {
+                  "direccion": "Carrera 45 #80-12",
+                  "descripcion": "Entrada principal del centro comercial",
+                  "codigoCiudad": "MED"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Viaje actualizado exitosamente", "content": { "application/json": { "example": "Viaje actualizado exitosamente" } } },
+          "404": { "description": "Viaje no encontrado" },
+          "500": { "description": "Error interno del servidor" }
+        }
+      },
+      "delete": {
+        "tags": ["Viajes"],
+        "summary": "Cancelar viaje (eliminación lógica)",
+        "description": "Cambia el id_estado del viaje a 5 (CANCELADO). No elimina el registro.",
+        "parameters": [
+          { "name": "codigo", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": {
+          "200": { "description": "Viaje cancelado exitosamente", "content": { "application/json": { "example": "Viaje cancelado exitosamente" } } },
+          "404": { "description": "Viaje no encontrado" },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/estados-usuario": {
+      "get": {
+        "tags": ["Catálogo"],
+        "summary": "Obtener todos los estados de usuario",
+        "responses": {
+          "200": {
+            "description": "Lista de estados de usuario",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/CatalogoItemDescripcion" } },
+                "example": [
+                  { "id": 1, "nombre": "Activo",   "descripcion": "Usuario activo en el sistema" },
+                  { "id": 2, "nombre": "Inactivo", "descripcion": "Usuario inactivo" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/metodos-pago": {
+      "get": {
+        "tags": ["Catálogo"],
+        "summary": "Obtener todos los métodos de pago",
+        "responses": {
+          "200": {
+            "description": "Lista de métodos de pago",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/CatalogoItemDescripcion" } },
+                "example": [
+                  { "id": 1, "nombre": "Efectivo",      "descripcion": "Pago en efectivo al conductor" },
+                  { "id": 2, "nombre": "Tarjeta",       "descripcion": "Pago con tarjeta débito o crédito" },
+                  { "id": 3, "nombre": "Transferencia", "descripcion": "Pago por transferencia bancaria" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/marcas": {
+      "get": {
+        "tags": ["Catálogo"],
+        "summary": "Obtener todas las marcas de vehículo",
+        "responses": {
+          "200": {
+            "description": "Lista de marcas",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/CatalogoItem" } },
+                "example": [
+                  { "id": 1, "nombre": "Toyota" },
+                  { "id": 2, "nombre": "Honda" },
+                  { "id": 3, "nombre": "Chevrolet" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/tipos-vehiculo": {
+      "get": {
+        "tags": ["Catálogo"],
+        "summary": "Obtener todos los tipos de vehículo",
+        "responses": {
+          "200": {
+            "description": "Lista de tipos de vehículo",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/CatalogoItem" } },
+                "example": [
+                  { "id": 1, "nombre": "Sedán" },
+                  { "id": 2, "nombre": "SUV" },
+                  { "id": 3, "nombre": "Camioneta" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/tipos-suscripcion": {
+      "get": {
+        "tags": ["Catálogo"],
+        "summary": "Obtener todos los tipos de suscripción",
+        "responses": {
+          "200": {
+            "description": "Lista de tipos de suscripción",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/CatalogoItemDescripcion" } },
+                "example": [
+                  { "id": 1, "nombre": "Básico",   "descripcion": "Plan básico de suscripción" },
+                  { "id": 2, "nombre": "Premium",  "descripcion": "Plan premium con beneficios adicionales" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/estados-suscripcion": {
+      "get": {
+        "tags": ["Catálogo"],
+        "summary": "Obtener todos los estados de suscripción",
+        "responses": {
+          "200": {
+            "description": "Lista de estados de suscripción",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/CatalogoItemDescripcion" } },
+                "example": [
+                  { "id": 1, "nombre": "Activa",   "descripcion": "Suscripción vigente" },
+                  { "id": 2, "nombre": "Vencida",  "descripcion": "Suscripción expirada" },
+                  { "id": 3, "nombre": "Cancelada","descripcion": "Suscripción cancelada por el usuario" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/ciudades": {
+      "get": {
+        "tags": ["Catálogo"],
+        "summary": "Obtener todas las ciudades",
+        "responses": {
+          "200": {
+            "description": "Lista de ciudades",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/CiudadResponse" } },
+                "example": [
+                  { "codigo": "MED", "nombre": "Medellín", "codigoDepartamento": "ANT" },
+                  { "codigo": "BOG", "nombre": "Bogotá",   "codigoDepartamento": "CUN" },
+                  { "codigo": "CLO", "nombre": "Cali",     "codigoDepartamento": "VAC" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/estados-viaje": {
+      "get": {
+        "tags": ["Catálogo"],
+        "summary": "Obtener todos los estados de viaje",
+        "responses": {
+          "200": {
+            "description": "Lista de estados de viaje",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/CatalogoItemDescripcion" } },
+                "example": [
+                  { "id": 1, "nombre": "Solicitado",  "descripcion": "Viaje recién solicitado" },
+                  { "id": 2, "nombre": "Aceptado",    "descripcion": "Conductor aceptó el viaje" },
+                  { "id": 3, "nombre": "En curso",    "descripcion": "Viaje en progreso" },
+                  { "id": 4, "nombre": "Finalizado",  "descripcion": "Viaje completado" },
+                  { "id": 5, "nombre": "Cancelado",   "descripcion": "Viaje cancelado" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    }
+
+  },
+
+  "components": {
+    "schemas": {
+
+      "CreateUserRequest": {
+        "type": "object",
+        "properties": {
+          "cedula":           { "type": "string" },
+          "primerNombre":     { "type": "string" },
+          "segundoNombre":    { "type": "string" },
+          "primerApellido":   { "type": "string" },
+          "segundoApellido":  { "type": "string" },
+          "correo":           { "type": "string", "format": "email" },
+          "contrasena":       { "type": "string" },
+          "fechaNacimiento":  { "type": "string", "format": "date" },
+          "idEstado":         { "type": "integer" },
+          "idMetodoPagoPref": { "type": "integer" }
+        }
+      },
+
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "primerNombre":     { "type": "string" },
+          "segundoNombre":    { "type": "string" },
+          "primerApellido":   { "type": "string" },
+          "segundoApellido":  { "type": "string" },
+          "correo":           { "type": "string", "format": "email" },
+          "contrasena":       { "type": "string" },
+          "fechaNacimiento":  { "type": "string", "format": "date" },
+          "idEstado":         { "type": "integer" },
+          "idMetodoPagoPref": { "type": "integer" }
+        }
+      },
+
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "cedula":           { "type": "string" },
+          "primerNombre":     { "type": "string" },
+          "segundoNombre":    { "type": "string" },
+          "primerApellido":   { "type": "string" },
+          "segundoApellido":  { "type": "string" },
+          "correo":           { "type": "string" },
+          "fechaNacimiento":  { "type": "string", "format": "date" },
+          "idEstado":         { "type": "integer" },
+          "idMetodoPagoPref": { "type": "integer" }
+        }
+      },
+
+      "CreateSuscripcionRequest": {
+        "type": "object",
+        "properties": {
+          "idTipo":        { "type": "integer" },
+          "idEstado":      { "type": "integer" },
+          "cedulaUsuario": { "type": "string" }
+        }
+      },
+
+      "UpdateSuscripcionRequest": {
+        "type": "object",
+        "properties": {
+          "idTipo":        { "type": "integer" },
+          "idEstado":      { "type": "integer" },
+          "cedulaUsuario": { "type": "string" }
+        }
+      },
+
+      "SuscripcionResponse": {
+        "type": "object",
+        "properties": {
+          "codigo":        { "type": "integer" },
+          "idTipo":        { "type": "integer" },
+          "idEstado":      { "type": "integer" },
+          "cedulaUsuario": { "type": "string" }
+        }
+      },
+
+      "CreateVehiculoRequest": {
+        "type": "object",
+        "properties": {
+          "placa":   { "type": "string" },
+          "modelo":  { "type": "string" },
+          "idMarca": { "type": "integer" },
+          "idTipo":  { "type": "integer" }
+        }
+      },
+
+      "UpdateVehiculoRequest": {
+        "type": "object",
+        "properties": {
+          "modelo":  { "type": "string" },
+          "idMarca": { "type": "integer" },
+          "idTipo":  { "type": "integer" }
+        }
+      },
+
+      "VehiculoResponse": {
+        "type": "object",
+        "properties": {
+          "placa":   { "type": "string" },
+          "modelo":  { "type": "string" },
+          "idMarca": { "type": "integer" },
+          "idTipo":  { "type": "integer" }
+        }
+      },
+
+      "DireccionRequest": {
+        "type": "object",
+        "properties": {
+          "direccion":    { "type": "string" },
+          "descripcion":  { "type": "string" },
+          "codigoCiudad": { "type": "string" }
+        }
+      },
+
+      "CreateViajeRequest": {
+        "type": "object",
+        "properties": {
+          "valorEstimado":    { "type": "number", "format": "decimal" },
+          "idEstado":         { "type": "integer" },
+          "cedulaUsuario":    { "type": "string" },
+          "cedulaConductor":  { "type": "string" },
+          "placaVehiculo":    { "type": "string" },
+          "direccionOrigen":  { "$ref": "#/components/schemas/DireccionRequest" },
+          "direccionDestino": { "$ref": "#/components/schemas/DireccionRequest" }
+        }
+      },
+
+      "UpdateViajeRequest": {
+        "type": "object",
+        "properties": {
+          "valorEstimado":    { "type": "number", "format": "decimal" },
+          "idEstado":         { "type": "integer" },
+          "cedulaUsuario":    { "type": "string" },
+          "cedulaConductor":  { "type": "string" },
+          "placaVehiculo":    { "type": "string" },
+          "direccionOrigen":  { "$ref": "#/components/schemas/DireccionRequest" },
+          "direccionDestino": { "$ref": "#/components/schemas/DireccionRequest" }
+        }
+      },
+
+      "ViajeResponse": {
+        "type": "object",
+        "properties": {
+          "codigo":              { "type": "integer" },
+          "fechaHora":           { "type": "string", "format": "date-time" },
+          "valorEstimado":       { "type": "number" },
+          "idEstado":            { "type": "integer" },
+          "idDireccionOrigen":   { "type": "integer" },
+          "idDireccionDestino":  { "type": "integer" },
+          "cedulaUsuario":       { "type": "string" },
+          "cedulaConductor":     { "type": "string" },
+          "placaVehiculo":       { "type": "string" }
+        }
+      },
+
+      "CatalogoItem": {
+        "type": "object",
+        "properties": {
+          "id":     { "type": "integer" },
+          "nombre": { "type": "string" }
+        }
+      },
+
+      "CatalogoItemDescripcion": {
+        "type": "object",
+        "properties": {
+          "id":          { "type": "integer" },
+          "nombre":      { "type": "string" },
+          "descripcion": { "type": "string" }
+        }
+      },
+
+      "CiudadResponse": {
+        "type": "object",
+        "properties": {
+          "codigo":              { "type": "string" },
+          "nombre":              { "type": "string" },
+          "codigoDepartamento":  { "type": "string" }
+        }
+      }
+
+    }
+  }
+}
