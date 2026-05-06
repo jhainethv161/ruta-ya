@@ -1,22 +1,17 @@
 package com.ruta_ya.repository;
 
-import com.ruta_ya.dto.CreateUserRequest;
-import com.ruta_ya.dto.UpdateUserRequest;
-import com.ruta_ya.dto.UserResponse;
+import com.ruta_ya.dto.request.CreateUserRequest;
+import com.ruta_ya.dto.request.UpdateUserRequest;
+import com.ruta_ya.dto.response.UserResponse;
 import com.ruta_ya.model.Usuario;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<Usuario, String> {

@@ -1,8 +1,8 @@
 package com.ruta_ya.controller;
 
-import com.ruta_ya.dto.CreateUserRequest;
-import com.ruta_ya.dto.UpdateUserRequest;
-import com.ruta_ya.dto.UserResponse;
+import com.ruta_ya.dto.request.CreateUserRequest;
+import com.ruta_ya.dto.request.UpdateUserRequest;
+import com.ruta_ya.dto.response.UserResponse;
 import com.ruta_ya.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/usuarios")

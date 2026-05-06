@@ -1,9 +1,9 @@
-package com.ruta_ya.dto;
+package com.ruta_ya.dto.request;
 
 import lombok.Data;
 
 @Data
-public class UpdateSuscripcionRequest {
+public class CreateSuscripcionRequest {
     private Integer idTipo;
     private Integer idEstado;
     private String cedulaUsuario;

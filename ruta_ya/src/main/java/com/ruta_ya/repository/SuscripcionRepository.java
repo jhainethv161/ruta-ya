@@ -1,8 +1,8 @@
 package com.ruta_ya.repository;
 
-import com.ruta_ya.dto.CreateSuscripcionRequest;
-import com.ruta_ya.dto.UpdateSuscripcionRequest;
-import com.ruta_ya.dto.SuscripcionResponse;
+import com.ruta_ya.dto.request.CreateSuscripcionRequest;
+import com.ruta_ya.dto.request.UpdateSuscripcionRequest;
+import com.ruta_ya.dto.response.SuscripcionResponse;
 import com.ruta_ya.model.Suscripcion;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;

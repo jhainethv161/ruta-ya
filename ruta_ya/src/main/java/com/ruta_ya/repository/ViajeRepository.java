@@ -1,6 +1,6 @@
 package com.ruta_ya.repository;
 
-import com.ruta_ya.dto.ViajeResponse;
+import com.ruta_ya.dto.response.ViajeResponse;
 import com.ruta_ya.model.Viaje;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;

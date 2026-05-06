@@ -1,13 +1,13 @@
 package com.ruta_ya.controller;
 
-import com.ruta_ya.dto.EstadoUsuarioResponse;
-import com.ruta_ya.dto.MarcaResponse;
-import com.ruta_ya.dto.MetodoPagoResponse;
-import com.ruta_ya.dto.CiudadResponse;
-import com.ruta_ya.dto.EstadoSuscripcionResponse;
-import com.ruta_ya.dto.EstadoViajeResponse;
-import com.ruta_ya.dto.TipoSuscripcionResponse;
-import com.ruta_ya.dto.TipoVehiculoResponse;
+import com.ruta_ya.dto.response.catalogo.EstadoUsuarioResponse;
+import com.ruta_ya.dto.response.catalogo.MarcaResponse;
+import com.ruta_ya.dto.response.catalogo.MetodoPagoResponse;
+import com.ruta_ya.dto.response.catalogo.CiudadResponse;
+import com.ruta_ya.dto.response.catalogo.EstadoSuscripcionResponse;
+import com.ruta_ya.dto.response.catalogo.EstadoViajeResponse;
+import com.ruta_ya.dto.response.catalogo.TipoSuscripcionResponse;
+import com.ruta_ya.dto.response.catalogo.TipoVehiculoResponse;
 import com.ruta_ya.service.CatalogoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

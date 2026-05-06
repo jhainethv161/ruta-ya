@@ -1,8 +1,8 @@
 package com.ruta_ya.repository;
 
-import com.ruta_ya.dto.CreateVehiculoRequest;
-import com.ruta_ya.dto.UpdateVehiculoRequest;
-import com.ruta_ya.dto.VehiculoResponse;
+import com.ruta_ya.dto.request.CreateVehiculoRequest;
+import com.ruta_ya.dto.request.UpdateVehiculoRequest;
+import com.ruta_ya.dto.response.VehiculoResponse;
 import com.ruta_ya.model.Vehiculo;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;

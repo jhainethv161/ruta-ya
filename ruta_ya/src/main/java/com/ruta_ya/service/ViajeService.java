@@ -1,8 +1,8 @@
 package com.ruta_ya.service;
 
-import com.ruta_ya.dto.CreateViajeRequest;
-import com.ruta_ya.dto.UpdateViajeRequest;
-import com.ruta_ya.dto.ViajeResponse;
+import com.ruta_ya.dto.request.CreateViajeRequest;
+import com.ruta_ya.dto.request.UpdateViajeRequest;
+import com.ruta_ya.dto.response.ViajeResponse;
 import com.ruta_ya.repository.DireccionRepository;
 import com.ruta_ya.repository.ViajeRepository;
 import lombok.RequiredArgsConstructor;

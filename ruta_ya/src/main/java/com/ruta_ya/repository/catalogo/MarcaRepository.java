@@ -1,6 +1,6 @@
-package com.ruta_ya.repository;
+package com.ruta_ya.repository.catalogo;
 
-import com.ruta_ya.dto.MarcaResponse;
+import com.ruta_ya.dto.response.catalogo.MarcaResponse;
 import com.ruta_ya.model.Marca;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,8 +1,8 @@
 package com.ruta_ya.controller;
 
-import com.ruta_ya.dto.CreateVehiculoRequest;
-import com.ruta_ya.dto.UpdateVehiculoRequest;
-import com.ruta_ya.dto.VehiculoResponse;
+import com.ruta_ya.dto.request.CreateVehiculoRequest;
+import com.ruta_ya.dto.request.UpdateVehiculoRequest;
+import com.ruta_ya.dto.response.VehiculoResponse;
 import com.ruta_ya.service.VehiculoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

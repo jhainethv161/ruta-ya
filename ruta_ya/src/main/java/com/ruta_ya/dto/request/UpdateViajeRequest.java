@@ -1,11 +1,11 @@
-package com.ruta_ya.dto;
+package com.ruta_ya.dto.request;
 
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class CreateViajeRequest {
+public class UpdateViajeRequest {
     private BigDecimal valorEstimado;
     private Integer idEstado;
     private String cedulaUsuario;

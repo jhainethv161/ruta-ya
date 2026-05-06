@@ -1,4 +1,4 @@
-package com.ruta_ya.dto;
+package com.ruta_ya.dto.response;
 
 public interface VehiculoResponse {
     String getPlaca();

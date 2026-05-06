@@ -1,14 +1,13 @@
 package com.ruta_ya.service;
 
-import com.ruta_ya.dto.CreateUserRequest;
-import com.ruta_ya.dto.UpdateUserRequest;
-import com.ruta_ya.dto.UserResponse;
+import com.ruta_ya.dto.request.CreateUserRequest;
+import com.ruta_ya.dto.request.UpdateUserRequest;
+import com.ruta_ya.dto.response.UserResponse;
 import com.ruta_ya.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service

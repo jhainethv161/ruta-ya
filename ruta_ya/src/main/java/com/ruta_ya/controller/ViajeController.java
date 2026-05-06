@@ -1,8 +1,8 @@
 package com.ruta_ya.controller;
 
-import com.ruta_ya.dto.CreateViajeRequest;
-import com.ruta_ya.dto.UpdateViajeRequest;
-import com.ruta_ya.dto.ViajeResponse;
+import com.ruta_ya.dto.request.CreateViajeRequest;
+import com.ruta_ya.dto.request.UpdateViajeRequest;
+import com.ruta_ya.dto.response.ViajeResponse;
 import com.ruta_ya.service.ViajeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

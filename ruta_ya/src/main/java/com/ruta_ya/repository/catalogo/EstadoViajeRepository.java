@@ -1,6 +1,6 @@
-package com.ruta_ya.repository;
+package com.ruta_ya.repository.catalogo;
 
-import com.ruta_ya.dto.EstadoViajeResponse;
+import com.ruta_ya.dto.response.catalogo.EstadoViajeResponse;
 import com.ruta_ya.model.EstadoViaje;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
