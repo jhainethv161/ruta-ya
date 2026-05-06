@@ -1,5 +1,6 @@
 package com.ruta_ya.controller;
 
+import com.ruta_ya.dto.CreateViajeRequest;
 import com.ruta_ya.dto.ViajeResponse;
 import com.ruta_ya.service.ViajeService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,20 @@ import java.util.List;
 public class ViajeController {
 
     private final ViajeService viajeService;
+
+    @PostMapping
+    public ResponseEntity<String> createViaje(@RequestBody CreateViajeRequest request) {
+        try {
+            boolean created = viajeService.createViaje(request);
+            if (created) {
+                return ResponseEntity.status(HttpStatus.CREATED).body("Viaje creado exitosamente");
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No se pudo crear el viaje");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
     @DeleteMapping("/{codigo}")
     public ResponseEntity<String> cancelarViaje(@PathVariable Integer codigo) {

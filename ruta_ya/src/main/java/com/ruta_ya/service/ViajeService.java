@@ -1,10 +1,14 @@
 package com.ruta_ya.service;
 
+import com.ruta_ya.dto.CreateViajeRequest;
 import com.ruta_ya.dto.ViajeResponse;
+import com.ruta_ya.repository.DireccionRepository;
 import com.ruta_ya.repository.ViajeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -12,6 +16,7 @@ import java.util.List;
 public class ViajeService {
 
     private final ViajeRepository viajeRepository;
+    private final DireccionRepository direccionRepository;
 
     public List<ViajeResponse> getAllViajes() {
         try {
@@ -28,6 +33,40 @@ public class ViajeService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al obtener el viaje");
+        }
+    }
+
+    @Transactional
+    public boolean createViaje(CreateViajeRequest request) {
+        try {
+            direccionRepository.insert(
+                    request.getDireccionOrigen().getDireccion(),
+                    request.getDireccionOrigen().getDescripcion(),
+                    request.getDireccionOrigen().getCodigoCiudad()
+            );
+            Integer idOrigen = direccionRepository.lastInsertId();
+
+            direccionRepository.insert(
+                    request.getDireccionDestino().getDireccion(),
+                    request.getDireccionDestino().getDescripcion(),
+                    request.getDireccionDestino().getCodigoCiudad()
+            );
+            Integer idDestino = direccionRepository.lastInsertId();
+
+            int rows = viajeRepository.create(
+                    Instant.now(),
+                    request.getValorEstimado(),
+                    request.getIdEstado(),
+                    idOrigen,
+                    idDestino,
+                    request.getCedulaUsuario(),
+                    request.getCedulaConductor(),
+                    request.getPlacaVehiculo()
+            );
+            return rows > 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al crear el viaje");
         }
     }
 

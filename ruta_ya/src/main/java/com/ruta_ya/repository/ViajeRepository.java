@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 @Repository
@@ -47,4 +49,19 @@ public interface ViajeRepository extends JpaRepository<Viaje, Integer> {
     @Transactional
     @Query(value = "UPDATE VIAJE SET id_estado = 5 WHERE codigo = :codigo", nativeQuery = true)
     int cancelar(@Param("codigo") Integer codigo);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        INSERT INTO VIAJE (fecha_hora, valor_estimado, id_estado, id_direccion_origen, id_direccion_destino, cedula_usuario, cedula_conductor, placa_vehiculo)
+        VALUES (:fechaHora, :valorEstimado, :idEstado, :idDireccionOrigen, :idDireccionDestino, :cedulaUsuario, :cedulaConductor, :placaVehiculo)
+    """, nativeQuery = true)
+    int create(@Param("fechaHora") Instant fechaHora,
+               @Param("valorEstimado") BigDecimal valorEstimado,
+               @Param("idEstado") Integer idEstado,
+               @Param("idDireccionOrigen") Integer idDireccionOrigen,
+               @Param("idDireccionDestino") Integer idDireccionDestino,
+               @Param("cedulaUsuario") String cedulaUsuario,
+               @Param("cedulaConductor") String cedulaConductor,
+               @Param("placaVehiculo") String placaVehiculo);
 }
