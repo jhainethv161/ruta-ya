@@ -3,9 +3,11 @@ package com.ruta_ya.service;
 import com.ruta_ya.dto.EstadoUsuarioResponse;
 import com.ruta_ya.dto.MarcaResponse;
 import com.ruta_ya.dto.MetodoPagoResponse;
+import com.ruta_ya.dto.CiudadResponse;
 import com.ruta_ya.dto.EstadoSuscripcionResponse;
 import com.ruta_ya.dto.TipoSuscripcionResponse;
 import com.ruta_ya.dto.TipoVehiculoResponse;
+import com.ruta_ya.repository.CiudadRepository;
 import com.ruta_ya.repository.EstadoSuscripcionRepository;
 import com.ruta_ya.repository.EstadoUsuarioRepository;
 import com.ruta_ya.repository.MarcaRepository;
@@ -27,6 +29,7 @@ public class CatalogoService {
     private final TipoVehiculoRepository tipoVehiculoRepository;
     private final TipoSuscripcionRepository tipoSuscripcionRepository;
     private final EstadoSuscripcionRepository estadoSuscripcionRepository;
+    private final CiudadRepository ciudadRepository;
 
     public List<EstadoUsuarioResponse> getAllEstadosUsuario() {
         try {
@@ -79,6 +82,15 @@ public class CatalogoService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al obtener los estados de suscripción");
+        }
+    }
+
+    public List<CiudadResponse> getAllCiudades() {
+        try {
+            return ciudadRepository.getAll();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al obtener las ciudades");
         }
     }
 }
