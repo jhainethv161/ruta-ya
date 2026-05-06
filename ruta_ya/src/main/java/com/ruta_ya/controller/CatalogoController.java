@@ -3,6 +3,7 @@ package com.ruta_ya.controller;
 import com.ruta_ya.dto.EstadoUsuarioResponse;
 import com.ruta_ya.dto.MarcaResponse;
 import com.ruta_ya.dto.MetodoPagoResponse;
+import com.ruta_ya.dto.TipoVehiculoResponse;
 import com.ruta_ya.service.CatalogoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,17 @@ public class CatalogoController {
         try {
             List<MarcaResponse> marcas = catalogoService.getAllMarcas();
             return ResponseEntity.ok(marcas);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/tipos-vehiculo")
+    public ResponseEntity<?> getAllTiposVehiculo() {
+        try {
+            List<TipoVehiculoResponse> tipos = catalogoService.getAllTiposVehiculo();
+            return ResponseEntity.ok(tipos);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
