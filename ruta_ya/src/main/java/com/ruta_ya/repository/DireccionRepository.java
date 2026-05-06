@@ -23,4 +23,18 @@ public interface DireccionRepository extends JpaRepository<Direccion, Integer> {
 
     @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
     Integer lastInsertId();
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        UPDATE DIRECCION
+        SET direccion = :direccion,
+            descripcion = :descripcion,
+            codigo_ciudad = :codigoCiudad
+        WHERE codigo = :codigo
+    """, nativeQuery = true)
+    int update(@Param("codigo") Integer codigo,
+               @Param("direccion") String direccion,
+               @Param("descripcion") String descripcion,
+               @Param("codigoCiudad") String codigoCiudad);
 }

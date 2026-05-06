@@ -1,6 +1,7 @@
 package com.ruta_ya.controller;
 
 import com.ruta_ya.dto.CreateViajeRequest;
+import com.ruta_ya.dto.UpdateViajeRequest;
 import com.ruta_ya.dto.ViajeResponse;
 import com.ruta_ya.service.ViajeService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,20 @@ public class ViajeController {
                 return ResponseEntity.status(HttpStatus.CREATED).body("Viaje creado exitosamente");
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No se pudo crear el viaje");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{codigo}")
+    public ResponseEntity<String> updateViaje(@PathVariable Integer codigo, @RequestBody UpdateViajeRequest request) {
+        try {
+            boolean updated = viajeService.updateViaje(codigo, request);
+            if (updated) {
+                return ResponseEntity.ok("Viaje actualizado exitosamente");
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Viaje no encontrado");
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

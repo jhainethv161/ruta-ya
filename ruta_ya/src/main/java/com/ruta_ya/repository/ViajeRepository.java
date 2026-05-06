@@ -64,4 +64,22 @@ public interface ViajeRepository extends JpaRepository<Viaje, Integer> {
                @Param("cedulaUsuario") String cedulaUsuario,
                @Param("cedulaConductor") String cedulaConductor,
                @Param("placaVehiculo") String placaVehiculo);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        UPDATE VIAJE
+        SET valor_estimado   = :valorEstimado,
+            id_estado        = :idEstado,
+            cedula_usuario   = :cedulaUsuario,
+            cedula_conductor = :cedulaConductor,
+            placa_vehiculo   = :placaVehiculo
+        WHERE codigo = :codigo
+    """, nativeQuery = true)
+    int update(@Param("codigo") Integer codigo,
+               @Param("valorEstimado") BigDecimal valorEstimado,
+               @Param("idEstado") Integer idEstado,
+               @Param("cedulaUsuario") String cedulaUsuario,
+               @Param("cedulaConductor") String cedulaConductor,
+               @Param("placaVehiculo") String placaVehiculo);
 }

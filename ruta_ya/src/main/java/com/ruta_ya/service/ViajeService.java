@@ -1,6 +1,7 @@
 package com.ruta_ya.service;
 
 import com.ruta_ya.dto.CreateViajeRequest;
+import com.ruta_ya.dto.UpdateViajeRequest;
 import com.ruta_ya.dto.ViajeResponse;
 import com.ruta_ya.repository.DireccionRepository;
 import com.ruta_ya.repository.ViajeRepository;
@@ -67,6 +68,41 @@ public class ViajeService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al crear el viaje");
+        }
+    }
+
+    @Transactional
+    public boolean updateViaje(Integer codigo, UpdateViajeRequest request) {
+        try {
+            ViajeResponse viaje = viajeRepository.findByCodigo(codigo);
+            if (viaje == null) return false;
+
+            direccionRepository.update(
+                    viaje.getIdDireccionOrigen(),
+                    request.getDireccionOrigen().getDireccion(),
+                    request.getDireccionOrigen().getDescripcion(),
+                    request.getDireccionOrigen().getCodigoCiudad()
+            );
+
+            direccionRepository.update(
+                    viaje.getIdDireccionDestino(),
+                    request.getDireccionDestino().getDireccion(),
+                    request.getDireccionDestino().getDescripcion(),
+                    request.getDireccionDestino().getCodigoCiudad()
+            );
+
+            int rows = viajeRepository.update(
+                    codigo,
+                    request.getValorEstimado(),
+                    request.getIdEstado(),
+                    request.getCedulaUsuario(),
+                    request.getCedulaConductor(),
+                    request.getPlacaVehiculo()
+            );
+            return rows > 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al actualizar el viaje");
         }
     }
 
