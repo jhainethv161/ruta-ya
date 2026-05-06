@@ -1,6 +1,7 @@
 package com.ruta_ya.controller;
 
 import com.ruta_ya.dto.EstadoUsuarioResponse;
+import com.ruta_ya.dto.MarcaResponse;
 import com.ruta_ya.dto.MetodoPagoResponse;
 import com.ruta_ya.service.CatalogoService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,17 @@ public class CatalogoController {
         try {
             List<MetodoPagoResponse> metodos = catalogoService.getAllMetodosPago();
             return ResponseEntity.ok(metodos);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/marcas")
+    public ResponseEntity<?> getAllMarcas() {
+        try {
+            List<MarcaResponse> marcas = catalogoService.getAllMarcas();
+            return ResponseEntity.ok(marcas);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
