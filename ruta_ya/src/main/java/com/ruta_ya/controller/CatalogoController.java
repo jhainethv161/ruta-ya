@@ -3,6 +3,7 @@ package com.ruta_ya.controller;
 import com.ruta_ya.dto.EstadoUsuarioResponse;
 import com.ruta_ya.dto.MarcaResponse;
 import com.ruta_ya.dto.MetodoPagoResponse;
+import com.ruta_ya.dto.EstadoSuscripcionResponse;
 import com.ruta_ya.dto.TipoSuscripcionResponse;
 import com.ruta_ya.dto.TipoVehiculoResponse;
 import com.ruta_ya.service.CatalogoService;
@@ -68,6 +69,17 @@ public class CatalogoController {
         try {
             List<TipoSuscripcionResponse> tipos = catalogoService.getAllTiposSuscripcion();
             return ResponseEntity.ok(tipos);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/estados-suscripcion")
+    public ResponseEntity<?> getAllEstadosSuscripcion() {
+        try {
+            List<EstadoSuscripcionResponse> estados = catalogoService.getAllEstadosSuscripcion();
+            return ResponseEntity.ok(estados);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

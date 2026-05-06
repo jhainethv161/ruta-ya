@@ -3,8 +3,10 @@ package com.ruta_ya.service;
 import com.ruta_ya.dto.EstadoUsuarioResponse;
 import com.ruta_ya.dto.MarcaResponse;
 import com.ruta_ya.dto.MetodoPagoResponse;
+import com.ruta_ya.dto.EstadoSuscripcionResponse;
 import com.ruta_ya.dto.TipoSuscripcionResponse;
 import com.ruta_ya.dto.TipoVehiculoResponse;
+import com.ruta_ya.repository.EstadoSuscripcionRepository;
 import com.ruta_ya.repository.EstadoUsuarioRepository;
 import com.ruta_ya.repository.MarcaRepository;
 import com.ruta_ya.repository.MetodoPagoRepository;
@@ -24,6 +26,7 @@ public class CatalogoService {
     private final MarcaRepository marcaRepository;
     private final TipoVehiculoRepository tipoVehiculoRepository;
     private final TipoSuscripcionRepository tipoSuscripcionRepository;
+    private final EstadoSuscripcionRepository estadoSuscripcionRepository;
 
     public List<EstadoUsuarioResponse> getAllEstadosUsuario() {
         try {
@@ -67,6 +70,15 @@ public class CatalogoService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al obtener los tipos de suscripción");
+        }
+    }
+
+    public List<EstadoSuscripcionResponse> getAllEstadosSuscripcion() {
+        try {
+            return estadoSuscripcionRepository.getAll();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al obtener los estados de suscripción");
         }
     }
 }
