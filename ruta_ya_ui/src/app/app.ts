@@ -1,13 +1,13 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ButtonComponent } from './components/atoms/button/button'; 
+import { Navbar } from './components/molecules/navbar/navbar';
+import { SidebarComponent } from './components/organisms/sidebar/sidebar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ButtonComponent],
+  standalone: true,
+  imports: [RouterOutlet, Navbar, SidebarComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
-  protected readonly title = signal('ruta_ya_ui');
-}
+export class App {}

@@ -1,1 +1,4 @@
-<p>form-field works!</p>
+<div class="flex flex-col gap-1">
+  <app-label [inputId]="id()" [label]="label()" />
+  <app-input [id]="id()" [type]="type()" [placeholder]="placeholder()" [control]="control()" />
+</div>
