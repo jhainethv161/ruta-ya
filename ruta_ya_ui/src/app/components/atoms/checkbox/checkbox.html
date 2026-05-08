@@ -1,0 +1,7 @@
+<input
+  type="checkbox"
+  [id]="id()"
+  [checked]="checked()"
+  (change)="change.emit(!checked())"
+  class="h-4 w-4 cursor-pointer accent-blue-600"
+/>
