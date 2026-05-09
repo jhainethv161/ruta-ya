@@ -1,3 +1,98 @@
-<div class="p-2">
-  <app-page-title title="Suscripciones" />
+<div class="flex flex-col gap-6 p-6">
+
+  <!-- Título con color de paleta -->
+  <h1 class="text-3xl font-bold text-[#1f2937] border-b-2 border-[#f59e0b] pb-4 mb-2">
+  Gestión de Suscripciones
+</h1>
+
+  <!-- Botón centrado -->
+  <div class="flex justify-center">
+    <app-button (click)="abrirModal()">+ Nuevo Usuario</app-button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+    <table class="w-full text-sm text-left">
+      <thead class="bg-[#1f2937] text-white text-xs uppercase tracking-wider">
+        <tr>
+          <th class="px-4 py-3">Nombre</th>
+          <th class="px-4 py-3">Correo</th>
+          <th class="px-4 py-3">Teléfono</th>
+          <th class="px-4 py-3">Rol</th>
+          <th class="px-4 py-3 text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of usuarios; track u.id) {
+          <tr class="border-t border-gray-100 hover:bg-amber-50 transition-colors">
+            <td class="px-4 py-3 font-medium text-[#1f2937]">{{ u.nombre }}</td>
+            <td class="px-4 py-3 text-[#6b7280]">{{ u.correo }}</td>
+            <td class="px-4 py-3 text-[#6b7280]">{{ u.telefono }}</td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-1 rounded-full text-xs font-semibold"
+                [ngClass]="u.rol === 'Conductor'
+                  ? 'bg-amber-100 text-amber-700'
+                  : 'bg-[#6b7280]/20 text-[#6b7280]'">
+                {{ u.rol }}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex justify-center gap-3">
+                <app-icon-button (click)="editar(u)">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                </app-icon-button>
+                <app-icon-button (click)="eliminar(u.id)">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </app-icon-button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="px-4 py-8 text-center text-[#6b7280]">
+              No hay usuarios registrados.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (modalAbierto) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-4">
+        <h2 class="text-lg font-bold text-[#1f2937] border-b border-[#f59e0b] pb-2">
+          {{ modoEdicion ? 'Editar Usuario' : 'Nuevo Usuario' }}
+        </h2>
+        <app-form-field id="nombre"   label="Nombre"   placeholder="Ej: Juan Pérez"     [control]="form.controls['nombre']" />
+        <app-form-field id="correo"   label="Correo"   placeholder="correo@ejemplo.com"  [control]="form.controls['correo']"   type="email" />
+        <app-form-field id="telefono" label="Teléfono" placeholder="Ej: 3001234567"      [control]="form.controls['telefono']" />
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-[#1f2937]">Rol</label>
+          <select [formControl]="form.controls['rol']"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-[#f59e0b]">
+            <option value="Pasajero">Pasajero</option>
+            <option value="Conductor">Conductor</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" (click)="cerrarModal()"
+            class="px-4 py-2 text-sm rounded-md border border-gray-300 text-[#6b7280] hover:bg-amber-50 transition-colors">
+            Cancelar
+          </button>
+          <app-button (click)="guardar()">
+            {{ modoEdicion ? 'Guardar cambios' : 'Crear usuario' }}
+          </app-button>
+        </div>
+      </div>
+    </div>
+  }
+
 </div>

@@ -1,8 +1,7 @@
-<a
-  [routerLink]="route()"
-  routerLinkActive="bg-blue-700 text-white"
-  class="flex items-center gap-3 px-4 py-3 rounded-lg text-blue-200 hover:bg-blue-800 hover:text-white transition-colors"
->
+[routerLink]="route()"
+  routerLinkActive="bg-[#f59e0b] text-[#1f2937] font-bold"
+  class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300
+         hover:bg-[#374151] hover:text-white transition-colors">
   <ng-content />
   <span class="text-sm font-medium">{{ label() }}</span>
 </a>
