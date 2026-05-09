@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
 
-import { PageTitleComponent }  from '../../components/atoms/page-title/page-title';
 import { ButtonComponent }     from '../../components/atoms/button/button';
 import { IconButtonComponent } from '../../components/atoms/icon-button/icon-button';
 import { FormFieldComponent }  from '../../components/molecules/form-field/form-field';
@@ -13,7 +12,6 @@ import { FormFieldComponent }  from '../../components/molecules/form-field/form-
   imports: [
     ReactiveFormsModule,
     NgClass,
-    PageTitleComponent,
     ButtonComponent,
     IconButtonComponent,
     FormFieldComponent,
