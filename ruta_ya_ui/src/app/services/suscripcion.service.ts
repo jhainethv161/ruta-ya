@@ -15,6 +15,12 @@ export interface CatalogoItemDescripcion {
   descripcion: string;
 }
 
+export interface CrearSuscripcionApi {
+  idTipo:        number;
+  idEstado:      number;
+  cedulaUsuario: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SuscripcionService {
   private readonly baseUrl    = 'http://localhost:8080';
@@ -27,6 +33,13 @@ export class SuscripcionService {
   getSuscripciones(): Observable<SuscripcionApi[]> {
     return this.http.get<SuscripcionApi[]>(this.url, {
       headers: { Accept: 'application/json' },
+    });
+  }
+
+  crearSuscripcion(suscripcion: CrearSuscripcionApi): Observable<string> {
+    return this.http.post(this.url, suscripcion, {
+      headers: { 'Content-Type': 'application/json' },
+      responseType: 'text',
     });
   }
 

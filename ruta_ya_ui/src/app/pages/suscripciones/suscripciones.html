@@ -74,18 +74,18 @@
           <label class="text-sm font-medium text-[#1f2937]">Tipo</label>
           <select [formControl]="form.controls['tipo']"
             class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f59e0b]">
-            <option value="Básico">Básico</option>
-            <option value="Estándar">Estándar</option>
-            <option value="Premium">Premium</option>
+            @for (t of tipos(); track t.id) {
+              <option [value]="t.nombre">{{ t.nombre }}</option>
+            }
           </select>
         </div>
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-[#1f2937]">Estado</label>
           <select [formControl]="form.controls['estado']"
             class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f59e0b]">
-            <option value="Activo">Activo</option>
-            <option value="Suspendido">Suspendido</option>
-            <option value="Cancelado">Cancelado</option>
+            @for (e of estados(); track e.id) {
+              <option [value]="e.nombre">{{ e.nombre }}</option>
+            }
           </select>
         </div>
         <div class="flex justify-end gap-3 pt-2">

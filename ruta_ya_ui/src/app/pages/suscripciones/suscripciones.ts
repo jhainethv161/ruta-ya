@@ -55,7 +55,11 @@ export class Suscripciones implements OnInit {
   abrirModal() {
     this.modoEdicion.set(false);
     this.codigoEditando = 0;
-    this.form.reset({ tipo: 'Básico', estado: 'Activo' });
+    this.form.reset({
+      cedulaUsuario: '',
+      tipo:          this.tipos()[0]?.nombre   ?? '',
+      estado:        this.estados()[0]?.nombre ?? '',
+    });
     this.modalAbierto.set(true);
   }
 
@@ -82,15 +86,26 @@ export class Suscripciones implements OnInit {
           ? { ...s, cedulaUsuario: v.cedulaUsuario!, tipo: v.tipo!, estado: v.estado! }
           : s
       ));
+      this.cerrarModal();
     } else {
-      this.suscripciones.update(list => [...list, {
-        codigo:        this.nextCodigo++,
+      const idTipo   = this.tipos().find(t => t.nombre === v.tipo)?.id;
+      const idEstado = this.estados().find(e => e.nombre === v.estado)?.id;
+      if (idTipo == null || idEstado == null) {
+        console.error('No se encontró el ID para tipo o estado', v.tipo, v.estado);
+        return;
+      }
+      this.suscripcionService.crearSuscripcion({
+        idTipo,
+        idEstado,
         cedulaUsuario: v.cedulaUsuario!,
-        tipo:          v.tipo!,
-        estado:        v.estado!,
-      }]);
+      }).subscribe({
+        next: () => {
+          this.cerrarModal();
+          this.cargar();
+        },
+        error: err => console.error('Error al crear suscripción', err),
+      });
     }
-    this.cerrarModal();
   }
 
   eliminar(codigo: number) {
