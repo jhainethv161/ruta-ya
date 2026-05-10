@@ -22,7 +22,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (u of usuarios; track u.id) {
+        @for (u of usuarios(); track u.id) {
           <tr class="border-t border-gray-100 hover:bg-amber-50 transition-colors">
             <td class="px-4 py-3 font-medium text-[#1f2937]">{{ u.cedula }}</td>
             <td class="px-4 py-3 font-medium text-[#1f2937]">{{ getNombreCompleto(u) }}</td>
@@ -71,11 +71,11 @@
     </table>
   </div>
 
-  @if (modalAbierto) {
+  @if (modalAbierto()) {
     <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
         <h2 class="text-lg font-bold text-[#1f2937] border-b border-[#f59e0b] pb-2">
-          {{ modoEdicion ? 'Editar Usuario' : 'Nuevo Usuario' }}
+          {{ modoEdicion() ? 'Editar Usuario' : 'Nuevo Usuario' }}
         </h2>
 
         <app-form-field id="cedula" label="Cédula" placeholder="Ej: 1234567890"
@@ -129,7 +129,7 @@
             Cancelar
           </button>
           <app-button (click)="guardar()">
-            {{ modoEdicion ? 'Guardar cambios' : 'Crear usuario' }}
+            {{ modoEdicion() ? 'Guardar cambios' : 'Crear usuario' }}
           </app-button>
         </div>
       </div>

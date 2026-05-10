@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
 
@@ -56,7 +56,7 @@ export class Usuario {
     { id: 4, nombre: 'Transferencia' },
   ];
 
-  usuarios: UsuarioItem[] = [
+  usuarios = signal<UsuarioItem[]>([
     {
       id: 1,
       cedula: '1234567890',
@@ -93,11 +93,12 @@ export class Usuario {
       idEstado: 2,
       idMetodoPagoPref: 3,
     },
-  ];
+  ]);
 
-  modalAbierto = false;
-  modoEdicion  = false;
-  idEditando: number | null = null;
+  modalAbierto = signal(false);
+  modoEdicion  = signal(false);
+
+  private idEditando: number | null = null;
   private nextId = 4;
 
   form = new FormGroup({
@@ -126,18 +127,18 @@ export class Usuario {
   }
 
   abrirModal() {
-    this.modoEdicion = false;
+    this.modoEdicion.set(false);
     this.idEditando  = null;
     this.form.reset({ idEstado: 1, idMetodoPagoPref: 1 });
-    this.modalAbierto = true;
+    this.modalAbierto.set(true);
   }
 
   cerrarModal() {
-    this.modalAbierto = false;
+    this.modalAbierto.set(false);
   }
 
   editar(u: UsuarioItem) {
-    this.modoEdicion = true;
+    this.modoEdicion.set(true);
     this.idEditando  = u.id;
     this.form.setValue({
       cedula:           u.cedula,
@@ -150,13 +151,13 @@ export class Usuario {
       idEstado:         u.idEstado,
       idMetodoPagoPref: u.idMetodoPagoPref,
     });
-    this.modalAbierto = true;
+    this.modalAbierto.set(true);
   }
 
   guardar() {
     const v = this.form.value;
-    if (this.modoEdicion) {
-      this.usuarios = this.usuarios.map(u =>
+    if (this.modoEdicion()) {
+      this.usuarios.update(list => list.map(u =>
         u.id === this.idEditando
           ? {
               ...u,
@@ -171,9 +172,9 @@ export class Usuario {
               idMetodoPagoPref: Number(v.idMetodoPagoPref),
             }
           : u
-      );
+      ));
     } else {
-      this.usuarios = [...this.usuarios, {
+      this.usuarios.update(list => [...list, {
         id:               this.nextId++,
         cedula:           v.cedula!,
         primerNombre:     v.primerNombre!,
@@ -184,12 +185,12 @@ export class Usuario {
         fechaNacimiento:  v.fechaNacimiento!,
         idEstado:         Number(v.idEstado),
         idMetodoPagoPref: Number(v.idMetodoPagoPref),
-      }];
+      }]);
     }
     this.cerrarModal();
   }
 
   eliminar(id: number) {
-    this.usuarios = this.usuarios.filter(u => u.id !== id);
+    this.usuarios.update(list => list.filter(u => u.id !== id));
   }
 }
