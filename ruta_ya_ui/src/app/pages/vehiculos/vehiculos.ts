@@ -1,9 +1,34 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonComponent }     from '../../components/atoms/button/button';
 import { IconButtonComponent } from '../../components/atoms/icon-button/icon-button';
 import { FormFieldComponent }  from '../../components/molecules/form-field/form-field';
+import { VehiculoService }     from '../../services/vehiculo.service';
+
+interface Vehiculo {
+  placa:  string;
+  modelo: string;
+  marca:  string;
+  tipo:   string;
+}
+
+const MARCAS: Record<number, string> = {
+  1: 'Chevrolet',
+  2: 'Renault',
+  3: 'Honda',
+  4: 'Toyota',
+  5: 'Mazda',
+  6: 'Kia',
+  7: 'AKT',
+};
+
+const TIPOS: Record<number, string> = {
+  1: 'Sedán',
+  2: 'Moto',
+  3: 'Campero',
+  4: 'Camioneta',
+};
 
 @Component({
   selector: 'app-vehiculos',
@@ -16,16 +41,9 @@ import { FormFieldComponent }  from '../../components/molecules/form-field/form-
   ],
   templateUrl: './vehiculos.html',
 })
-export class Vehiculos {
+export class Vehiculos implements OnInit {
 
-  vehiculos = [
-    { placa: 'ABC123', modelo: 'Spark 2022',    marca: 'Chevrolet', tipo: 'Sedán'   },
-    { placa: 'DEF456', modelo: 'Logan 2021',    marca: 'Renault',   tipo: 'Sedán'   },
-    { placa: 'GHI789', modelo: 'Mazda 3 2023',  marca: 'Mazda',     tipo: 'Sedán'   },
-    { placa: 'JKL012', modelo: 'Corolla 2020',  marca: 'Toyota',    tipo: 'Sedán'   },
-    { placa: 'MNO345', modelo: 'Sportage 2022', marca: 'Kia',       tipo: 'Campero' },
-    { placa: 'XYZ999', modelo: 'Spark GT 2024', marca: 'Chevrolet', tipo: 'Sedán'   },
-  ];
+  vehiculos = signal<Vehiculo[]>([]);
 
   modalAbierto  = false;
   modoEdicion   = false;
@@ -38,6 +56,19 @@ export class Vehiculos {
     tipo:   new FormControl('Sedán'),
   });
 
+  constructor(private vehiculoService: VehiculoService) {}
+
+  ngOnInit() {
+    this.vehiculoService.getVehiculos().subscribe(data => {
+      this.vehiculos.set(data.map(v => ({
+        placa:  v.placa,
+        modelo: v.modelo,
+        marca:  MARCAS[v.idMarca] ?? `Marca ${v.idMarca}`,
+        tipo:   TIPOS[v.idTipo]   ?? `Tipo ${v.idTipo}`,
+      })));
+    });
+  }
+
   abrirModal() {
     this.modoEdicion   = false;
     this.placaEditando = '';
@@ -49,7 +80,7 @@ export class Vehiculos {
     this.modalAbierto = false;
   }
 
-  editar(v: any) {
+  editar(v: Vehiculo) {
     this.modoEdicion   = true;
     this.placaEditando = v.placa;
     this.form.setValue({ placa: v.placa, modelo: v.modelo, marca: v.marca, tipo: v.tipo });
@@ -59,23 +90,23 @@ export class Vehiculos {
   guardar() {
     const v = this.form.value;
     if (this.modoEdicion) {
-      this.vehiculos = this.vehiculos.map(x =>
+      this.vehiculos.update(list => list.map(x =>
         x.placa === this.placaEditando
           ? { placa: v.placa!, modelo: v.modelo!, marca: v.marca!, tipo: v.tipo! }
           : x
-      );
+      ));
     } else {
-      this.vehiculos = [...this.vehiculos, {
+      this.vehiculos.update(list => [...list, {
         placa:  v.placa!,
         modelo: v.modelo!,
         marca:  v.marca!,
         tipo:   v.tipo!,
-      }];
+      }]);
     }
     this.cerrarModal();
   }
 
   eliminar(placa: string) {
-    this.vehiculos = this.vehiculos.filter(x => x.placa !== placa);
+    this.vehiculos.update(list => list.filter(x => x.placa !== placa));
   }
 }
