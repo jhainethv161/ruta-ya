@@ -45,6 +45,8 @@ export class Usuario implements OnInit {
   private idEditando: string | null = null;
   private nextId = 4;
 
+  busqueda = new FormControl('');
+
   form = new FormGroup({
     cedula:           new FormControl(''),
     primerNombre:     new FormControl(''),
@@ -195,5 +197,35 @@ export class Usuario implements OnInit {
       next: () => this.cargar(),
       error: err => console.error('Error al eliminar usuario', err),
     });
+  }
+
+  buscar() {
+    const cedula = this.busqueda.value?.trim();
+    if (!cedula) {
+      this.cargar();
+      return;
+    }
+    this.usuarioService.getUsuarioPorCedula(cedula).subscribe({
+      next: u => this.usuarios.set([{
+        cedula:           u.cedula,
+        primerNombre:     u.primerNombre,
+        segundoNombre:    u.segundoNombre,
+        primerApellido:   u.primerApellido,
+        segundoApellido:  u.segundoApellido,
+        correo:           u.correo,
+        fechaNacimiento:  u.fechaNacimiento,
+        idEstado:         u.idEstado,
+        idMetodoPagoPref: u.idMetodoPagoPref,
+      }]),
+      error: err => {
+        console.error('Usuario no encontrado', err);
+        this.usuarios.set([]);
+      },
+    });
+  }
+
+  limpiarBusqueda() {
+    this.busqueda.setValue('');
+    this.cargar();
   }
 }

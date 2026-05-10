@@ -39,6 +39,8 @@ export class Suscripciones implements OnInit {
   private codigoEditando = 0;
   private nextCodigo     = 1;
 
+  busqueda = new FormControl('');
+
   form = new FormGroup({
     cedulaUsuario: new FormControl(''),
     tipo:          new FormControl('Básico'),
@@ -111,6 +113,35 @@ export class Suscripciones implements OnInit {
       next: () => this.cargar(),
       error: err => console.error('Error al eliminar suscripción', err),
     });
+  }
+
+  buscar() {
+    const cedula = this.busqueda.value?.trim();
+    if (!cedula) {
+      this.cargar();
+      return;
+    }
+    const tipos   = this.tipos();
+    const estados = this.estados();
+    this.suscripcionService.getSuscripcionesPorUsuario(cedula).subscribe({
+      next: data => {
+        this.suscripciones.set(data.map(s => ({
+          codigo:        s.codigo,
+          tipo:          tipos.find(t => t.id === s.idTipo)?.nombre     ?? `Tipo ${s.idTipo}`,
+          estado:        estados.find(e => e.id === s.idEstado)?.nombre ?? `Estado ${s.idEstado}`,
+          cedulaUsuario: s.cedulaUsuario,
+        })));
+      },
+      error: err => {
+        console.error('Suscripciones no encontradas', err);
+        this.suscripciones.set([]);
+      },
+    });
+  }
+
+  limpiarBusqueda() {
+    this.busqueda.setValue('');
+    this.cargar();
   }
 
   private cargarCatalogos() {

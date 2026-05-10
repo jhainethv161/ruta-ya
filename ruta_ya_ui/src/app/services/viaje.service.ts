@@ -76,6 +76,12 @@ export class ViajeService {
     });
   }
 
+  getViajePorCodigo(codigo: number): Observable<ViajeApi> {
+    return this.http.get<ViajeApi>(`${this.url}/${codigo}`, {
+      headers: { Accept: 'application/json' },
+    });
+  }
+
   crearViaje(viaje: CrearViajeApi): Observable<string> {
     return this.http.post(this.url, viaje, {
       headers: { 'Content-Type': 'application/json' },

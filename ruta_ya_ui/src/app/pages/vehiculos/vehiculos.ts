@@ -38,6 +38,8 @@ export class Vehiculos implements OnInit {
 
   private placaEditando = '';
 
+  busqueda = new FormControl('');
+
   form = new FormGroup({
     placa:   new FormControl(''),
     modelo:  new FormControl(''),
@@ -110,6 +112,35 @@ export class Vehiculos implements OnInit {
         console.error('Error al guardar vehículo', err);
       },
     });
+  }
+
+  buscar() {
+    const placa = this.busqueda.value?.trim();
+    if (!placa) {
+      this.cargar();
+      return;
+    }
+    const marcas = this.marcas();
+    const tipos  = this.tipos();
+    this.vehiculoService.getVehiculoPorPlaca(placa).subscribe({
+      next: v => this.vehiculos.set([{
+        placa:   v.placa,
+        modelo:  v.modelo,
+        marca:   marcas.find(m => m.id === v.idMarca)?.nombre ?? `Marca ${v.idMarca}`,
+        tipo:    tipos.find(t => t.id === v.idTipo)?.nombre   ?? `Tipo ${v.idTipo}`,
+        idMarca: v.idMarca,
+        idTipo:  v.idTipo,
+      }]),
+      error: err => {
+        console.error('Vehículo no encontrado', err);
+        this.vehiculos.set([]);
+      },
+    });
+  }
+
+  limpiarBusqueda() {
+    this.busqueda.setValue('');
+    this.cargar();
   }
 
   private cargar() {

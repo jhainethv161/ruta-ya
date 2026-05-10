@@ -61,6 +61,12 @@ export class UsuarioService {
     });
   }
 
+  getUsuarioPorCedula(cedula: string): Observable<UsuarioApi> {
+    return this.http.get<UsuarioApi>(`${this.url}/${cedula}`, {
+      headers: { Accept: 'application/json' },
+    });
+  }
+
   getEstados(): Observable<CatalogoItemDescripcion[]> {
     return this.http.get<CatalogoItemDescripcion[]>(this.estadosUrl, {
       headers: { Accept: 'application/json' },

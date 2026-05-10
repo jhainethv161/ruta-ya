@@ -46,7 +46,8 @@ export class Viajes implements OnInit {
   modoEdicion  = signal(false);
 
   private codigoEditando = 0;
-  private nextCodigo     = 1;
+
+  busqueda = new FormControl('');
 
   form = new FormGroup({
     fechaHora:     new FormControl(''),
@@ -160,6 +161,35 @@ export class Viajes implements OnInit {
     });
   }
 
+  buscar() {
+    const codigo = Number(this.busqueda.value);
+    if (!codigo || Number.isNaN(codigo)) {
+      this.cargar();
+      return;
+    }
+    const estados = this.estados();
+    this.viajeService.getViajePorCodigo(codigo).subscribe({
+      next: v => this.viajes.set([{
+        codigo:          v.codigo,
+        fechaHora:       v.fechaHora,
+        valorEstimado:   v.valorEstimado,
+        estado:          estados.find(e => e.id === v.idEstado)?.nombre ?? `Estado ${v.idEstado}`,
+        cedulaUsuario:   v.cedulaUsuario,
+        cedulaConductor: v.cedulaConductor,
+        placaVehiculo:   v.placaVehiculo,
+      }]),
+      error: err => {
+        console.error('Viaje no encontrado', err);
+        this.viajes.set([]);
+      },
+    });
+  }
+
+  limpiarBusqueda() {
+    this.busqueda.setValue('');
+    this.cargar();
+  }
+
   private cargarCatalogos() {
     forkJoin({
       estados:      this.viajeService.getEstados(),
@@ -189,7 +219,6 @@ export class Viajes implements OnInit {
           cedulaConductor: v.cedulaConductor,
           placaVehiculo:   v.placaVehiculo,
         })));
-        this.nextCodigo = data.reduce((max, v) => Math.max(max, v.codigo), 0) + 1;
       },
       error: err => console.error('Error al cargar viajes', err),
     });

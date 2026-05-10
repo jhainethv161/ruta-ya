@@ -42,6 +42,12 @@ export class SuscripcionService {
     });
   }
 
+  getSuscripcionesPorUsuario(cedula: string): Observable<SuscripcionApi[]> {
+    return this.http.get<SuscripcionApi[]>(`${this.url}/usuario/${cedula}`, {
+      headers: { Accept: 'application/json' },
+    });
+  }
+
   crearSuscripcion(suscripcion: CrearSuscripcionApi): Observable<string> {
     return this.http.post(this.url, suscripcion, {
       headers: { 'Content-Type': 'application/json' },

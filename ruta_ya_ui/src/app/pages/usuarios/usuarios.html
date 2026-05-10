@@ -8,6 +8,16 @@
     <app-button (click)="abrirModal()">+ Nuevo Usuario</app-button>
   </div>
 
+  <div class="flex gap-2 items-center">
+    <input [formControl]="busqueda" placeholder="Buscar por cédula..."
+      class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f59e0b]" />
+    <app-button (click)="buscar()">Buscar</app-button>
+    <button type="button" (click)="limpiarBusqueda()"
+      class="px-4 py-2 text-sm rounded-md border border-gray-300 text-[#6b7280] hover:bg-gray-50 transition-colors">
+      Limpiar
+    </button>
+  </div>
+
   <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
     <table class="w-full text-sm text-left">
       <thead class="bg-[#1f2937] text-white text-xs uppercase tracking-wider">

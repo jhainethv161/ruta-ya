@@ -35,6 +35,12 @@ export class VehiculoService {
     });
   }
 
+  getVehiculoPorPlaca(placa: string): Observable<VehiculoApi> {
+    return this.http.get<VehiculoApi>(`${this.url}/${placa}`, {
+      headers: { Accept: 'application/json' },
+    });
+  }
+
   crearVehiculo(vehiculo: VehiculoApi): Observable<string> {
     return this.http.post(this.url, vehiculo, {
       headers: { 'Content-Type': 'application/json' },
