@@ -58,11 +58,11 @@
     </table>
   </div>
 
-  @if (modalAbierto) {
+  @if (modalAbierto()) {
     <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-4">
         <h2 class="text-lg font-bold text-[#1f2937] border-b border-[#f59e0b] pb-2">
-          {{ modoEdicion ? 'Editar Vehículo' : 'Nuevo Vehículo' }}
+          {{ modoEdicion() ? 'Editar Vehículo' : 'Nuevo Vehículo' }}
         </h2>
         <app-form-field id="placa"  label="Placa"  placeholder="Ej: ABC123"      [control]="form.controls['placa']" />
         <app-form-field id="modelo" label="Modelo" placeholder="Ej: Spark 2022"  [control]="form.controls['modelo']" />
@@ -91,8 +91,8 @@
             class="px-4 py-2 text-sm rounded-md border border-gray-300 text-[#6b7280] hover:bg-gray-50 transition-colors">
             Cancelar
           </button>
-          <app-button (click)="guardar()">
-            {{ modoEdicion ? 'Guardar cambios' : 'Crear vehículo' }}
+          <app-button (click)="guardar()" [disabled]="guardando()">
+            {{ modoEdicion() ? 'Guardar cambios' : 'Crear vehículo' }}
           </app-button>
         </div>
       </div>

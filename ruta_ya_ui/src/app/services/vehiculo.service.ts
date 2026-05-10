@@ -20,4 +20,11 @@ export class VehiculoService {
       headers: { Accept: 'application/json' },
     });
   }
+
+  crearVehiculo(vehiculo: VehiculoApi): Observable<string> {
+    return this.http.post(this.url, vehiculo, {
+      headers: { 'Content-Type': 'application/json' },
+      responseType: 'text',
+    });
+  }
 }
