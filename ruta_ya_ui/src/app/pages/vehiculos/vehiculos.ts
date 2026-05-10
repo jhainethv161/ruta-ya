@@ -112,10 +112,6 @@ export class Vehiculos implements OnInit {
     });
   }
 
-  eliminar(placa: string) {
-    this.vehiculos.update(list => list.filter(x => x.placa !== placa));
-  }
-
   private cargar() {
     const marcas = this.marcas();
     const tipos  = this.tipos();
