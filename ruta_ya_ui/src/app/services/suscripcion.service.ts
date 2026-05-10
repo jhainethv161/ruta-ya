@@ -21,6 +21,12 @@ export interface CrearSuscripcionApi {
   cedulaUsuario: string;
 }
 
+export interface ActualizarSuscripcionApi {
+  idTipo:        number;
+  idEstado:      number;
+  cedulaUsuario: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SuscripcionService {
   private readonly baseUrl    = 'http://localhost:8080';
@@ -38,6 +44,13 @@ export class SuscripcionService {
 
   crearSuscripcion(suscripcion: CrearSuscripcionApi): Observable<string> {
     return this.http.post(this.url, suscripcion, {
+      headers: { 'Content-Type': 'application/json' },
+      responseType: 'text',
+    });
+  }
+
+  actualizarSuscripcion(codigo: number, suscripcion: ActualizarSuscripcionApi): Observable<string> {
+    return this.http.put(`${this.url}/${codigo}`, suscripcion, {
       headers: { 'Content-Type': 'application/json' },
       responseType: 'text',
     });

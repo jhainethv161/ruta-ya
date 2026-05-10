@@ -79,33 +79,31 @@ export class Suscripciones implements OnInit {
   }
 
   guardar() {
-    const v = this.form.value;
-    if (this.modoEdicion()) {
-      this.suscripciones.update(list => list.map(s =>
-        s.codigo === this.codigoEditando
-          ? { ...s, cedulaUsuario: v.cedulaUsuario!, tipo: v.tipo!, estado: v.estado! }
-          : s
-      ));
-      this.cerrarModal();
-    } else {
-      const idTipo   = this.tipos().find(t => t.nombre === v.tipo)?.id;
-      const idEstado = this.estados().find(e => e.nombre === v.estado)?.id;
-      if (idTipo == null || idEstado == null) {
-        console.error('No se encontró el ID para tipo o estado', v.tipo, v.estado);
-        return;
-      }
-      this.suscripcionService.crearSuscripcion({
-        idTipo,
-        idEstado,
-        cedulaUsuario: v.cedulaUsuario!,
-      }).subscribe({
-        next: () => {
-          this.cerrarModal();
-          this.cargar();
-        },
-        error: err => console.error('Error al crear suscripción', err),
-      });
+    const v        = this.form.value;
+    const idTipo   = this.tipos().find(t => t.nombre === v.tipo)?.id;
+    const idEstado = this.estados().find(e => e.nombre === v.estado)?.id;
+    if (idTipo == null || idEstado == null) {
+      console.error('No se encontró el ID para tipo o estado', v.tipo, v.estado);
+      return;
     }
+
+    const payload = {
+      idTipo,
+      idEstado,
+      cedulaUsuario: v.cedulaUsuario!,
+    };
+
+    const peticion$ = this.modoEdicion()
+      ? this.suscripcionService.actualizarSuscripcion(this.codigoEditando, payload)
+      : this.suscripcionService.crearSuscripcion(payload);
+
+    peticion$.subscribe({
+      next: () => {
+        this.cerrarModal();
+        this.cargar();
+      },
+      error: err => console.error('Error al guardar suscripción', err),
+    });
   }
 
   eliminar(codigo: number) {
