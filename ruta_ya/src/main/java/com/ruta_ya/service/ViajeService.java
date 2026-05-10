@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -55,7 +55,7 @@ public class ViajeService {
             Integer idDestino = direccionRepository.lastInsertId();
 
             int rows = viajeRepository.create(
-                    Instant.now(),
+                    LocalDateTime.now(),
                     request.getValorEstimado(),
                     request.getIdEstado(),
                     idOrigen,

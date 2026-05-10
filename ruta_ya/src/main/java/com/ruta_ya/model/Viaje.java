@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,7 +18,7 @@ public class Viaje {
     private Integer id;
 
     @Column(name = "fecha_hora", nullable = false)
-    private Instant fechaHora;
+    private LocalDateTime fechaHora;
 
     @Column(name = "valor_estimado", nullable = false, precision = 10, scale = 2)
     private BigDecimal valorEstimado;

@@ -1,11 +1,11 @@
 package com.ruta_ya.dto.response;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public interface ViajeResponse {
     Integer getCodigo();
-    Instant getFechaHora();
+    LocalDateTime getFechaHora();
     BigDecimal getValorEstimado();
     Integer getIdEstado();
     Integer getIdDireccionOrigen();

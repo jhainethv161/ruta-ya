@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -56,7 +56,7 @@ public interface ViajeRepository extends JpaRepository<Viaje, Integer> {
         INSERT INTO VIAJE (fecha_hora, valor_estimado, id_estado, id_direccion_origen, id_direccion_destino, cedula_usuario, cedula_conductor, placa_vehiculo)
         VALUES (:fechaHora, :valorEstimado, :idEstado, :idDireccionOrigen, :idDireccionDestino, :cedulaUsuario, :cedulaConductor, :placaVehiculo)
     """, nativeQuery = true)
-    int create(@Param("fechaHora") Instant fechaHora,
+    int create(@Param("fechaHora") LocalDateTime fechaHora,
                @Param("valorEstimado") BigDecimal valorEstimado,
                @Param("idEstado") Integer idEstado,
                @Param("idDireccionOrigen") Integer idDireccionOrigen,
