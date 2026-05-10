@@ -1,20 +1,12 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
+import { forkJoin } from 'rxjs';
 
 import { ButtonComponent }     from '../../components/atoms/button/button';
 import { IconButtonComponent } from '../../components/atoms/icon-button/icon-button';
 import { FormFieldComponent }  from '../../components/molecules/form-field/form-field';
-
-interface Estado {
-  id: number;
-  nombre: string;
-}
-
-interface MetodoPago {
-  id: number;
-  nombre: string;
-}
+import { CatalogoItemDescripcion, UsuarioService } from '../../services/usuario.service';
 
 interface UsuarioItem {
   id: number;
@@ -41,20 +33,10 @@ interface UsuarioItem {
   ],
   templateUrl: './usuarios.html',
 })
-export class Usuario {
+export class Usuario implements OnInit {
 
-  estados: Estado[] = [
-    { id: 1, nombre: 'Activo' },
-    { id: 2, nombre: 'Inactivo' },
-    { id: 3, nombre: 'Suspendido' },
-  ];
-
-  metodosPago: MetodoPago[] = [
-    { id: 1, nombre: 'Efectivo' },
-    { id: 2, nombre: 'Tarjeta de crédito' },
-    { id: 3, nombre: 'Tarjeta débito' },
-    { id: 4, nombre: 'Transferencia' },
-  ];
+  estados     = signal<CatalogoItemDescripcion[]>([]);
+  metodosPago = signal<CatalogoItemDescripcion[]>([]);
 
   usuarios = signal<UsuarioItem[]>([
     {
@@ -113,12 +95,31 @@ export class Usuario {
     idMetodoPagoPref: new FormControl(1),
   });
 
+  constructor(private usuarioService: UsuarioService) {}
+
+  ngOnInit() {
+    this.cargarCatalogos();
+  }
+
   getNombreEstado(id: number): string {
-    return this.estados.find(e => e.id === id)?.nombre ?? '';
+    return this.estados().find(e => e.id === id)?.nombre ?? '';
   }
 
   getNombreMetodoPago(id: number): string {
-    return this.metodosPago.find(m => m.id === id)?.nombre ?? '';
+    return this.metodosPago().find(m => m.id === id)?.nombre ?? '';
+  }
+
+  private cargarCatalogos() {
+    forkJoin({
+      estados:     this.usuarioService.getEstados(),
+      metodosPago: this.usuarioService.getMetodosPago(),
+    }).subscribe({
+      next: ({ estados, metodosPago }) => {
+        this.estados.set(estados);
+        this.metodosPago.set(metodosPago);
+      },
+      error: err => console.error('Error al cargar catálogos', err),
+    });
   }
 
   getNombreCompleto(u: UsuarioItem): string {
