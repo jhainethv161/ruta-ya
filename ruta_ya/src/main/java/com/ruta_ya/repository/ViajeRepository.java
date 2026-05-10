@@ -69,7 +69,8 @@ public interface ViajeRepository extends JpaRepository<Viaje, Integer> {
     @Transactional
     @Query(value = """
         UPDATE VIAJE
-        SET valor_estimado   = :valorEstimado,
+        SET fecha_hora       = :fechaHora,
+            valor_estimado   = :valorEstimado,
             id_estado        = :idEstado,
             cedula_usuario   = :cedulaUsuario,
             cedula_conductor = :cedulaConductor,
@@ -77,6 +78,7 @@ public interface ViajeRepository extends JpaRepository<Viaje, Integer> {
         WHERE codigo = :codigo
     """, nativeQuery = true)
     int update(@Param("codigo") Integer codigo,
+               @Param("fechaHora") LocalDateTime fechaHora,
                @Param("valorEstimado") BigDecimal valorEstimado,
                @Param("idEstado") Integer idEstado,
                @Param("cedulaUsuario") String cedulaUsuario,
