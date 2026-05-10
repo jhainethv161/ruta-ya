@@ -23,7 +23,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (v of viajes; track v.codigo) {
+        @for (v of viajes(); track v.codigo) {
           <tr class="border-t border-gray-100 hover:bg-amber-50 transition-colors">
             <td class="px-4 py-3 font-medium text-[#1f2937]">{{ v.codigo }}</td>
             <td class="px-4 py-3 text-[#6b7280]">{{ v.fechaHora }}</td>
@@ -71,11 +71,11 @@
     </table>
   </div>
 
-  @if (modalAbierto) {
+  @if (modalAbierto()) {
     <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-4">
         <h2 class="text-lg font-bold text-[#1f2937] border-b border-[#f59e0b] pb-2">
-          {{ modoEdicion ? 'Editar Viaje' : 'Nuevo Viaje' }}
+          {{ modoEdicion() ? 'Editar Viaje' : 'Nuevo Viaje' }}
         </h2>
         <app-form-field id="fechaHora"       label="Fecha y Hora"      type="datetime-local" placeholder="" [control]="form.controls['fechaHora']" />
         <app-form-field id="valorEstimado"   label="Valor Estimado"    type="number" placeholder="Ej: 15000"    [control]="form.controls['valorEstimado']" />
@@ -98,7 +98,7 @@
             Cancelar
           </button>
           <app-button (click)="guardar()">
-            {{ modoEdicion ? 'Guardar cambios' : 'Crear viaje' }}
+            {{ modoEdicion() ? 'Guardar cambios' : 'Crear viaje' }}
           </app-button>
         </div>
       </div>
