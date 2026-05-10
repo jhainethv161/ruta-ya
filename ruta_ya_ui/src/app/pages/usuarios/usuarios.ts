@@ -6,7 +6,7 @@ import { forkJoin } from 'rxjs';
 import { ButtonComponent }     from '../../components/atoms/button/button';
 import { IconButtonComponent } from '../../components/atoms/icon-button/icon-button';
 import { FormFieldComponent }  from '../../components/molecules/form-field/form-field';
-import { CatalogoItemDescripcion, UsuarioService } from '../../services/usuario.service';
+import { CatalogoItemDescripcion, CrearUsuarioApi, UsuarioService } from '../../services/usuario.service';
 
 interface UsuarioItem {
   id: number;
@@ -90,6 +90,7 @@ export class Usuario implements OnInit {
     primerApellido:   new FormControl(''),
     segundoApellido:  new FormControl(''),
     correo:           new FormControl(''),
+    contrasena:       new FormControl(''),
     fechaNacimiento:  new FormControl(''),
     idEstado:         new FormControl(1),
     idMetodoPagoPref: new FormControl(1),
@@ -148,6 +149,7 @@ export class Usuario implements OnInit {
       primerApellido:   u.primerApellido,
       segundoApellido:  u.segundoApellido,
       correo:           u.correo,
+      contrasena:       '',
       fechaNacimiento:  u.fechaNacimiento,
       idEstado:         u.idEstado,
       idMetodoPagoPref: u.idMetodoPagoPref,
@@ -174,21 +176,41 @@ export class Usuario implements OnInit {
             }
           : u
       ));
-    } else {
-      this.usuarios.update(list => [...list, {
-        id:               this.nextId++,
-        cedula:           v.cedula!,
-        primerNombre:     v.primerNombre!,
-        segundoNombre:    v.segundoNombre ?? '',
-        primerApellido:   v.primerApellido!,
-        segundoApellido:  v.segundoApellido ?? '',
-        correo:           v.correo!,
-        fechaNacimiento:  v.fechaNacimiento!,
-        idEstado:         Number(v.idEstado),
-        idMetodoPagoPref: Number(v.idMetodoPagoPref),
-      }]);
+      this.cerrarModal();
+      return;
     }
-    this.cerrarModal();
+
+    const payload: CrearUsuarioApi = {
+      cedula:           v.cedula!,
+      primerNombre:     v.primerNombre!,
+      segundoNombre:    v.segundoNombre ?? '',
+      primerApellido:   v.primerApellido!,
+      segundoApellido:  v.segundoApellido ?? '',
+      correo:           v.correo!,
+      contrasena:       v.contrasena!,
+      fechaNacimiento:  v.fechaNacimiento!,
+      idEstado:         Number(v.idEstado),
+      idMetodoPagoPref: Number(v.idMetodoPagoPref),
+    };
+
+    this.usuarioService.crearUsuario(payload).subscribe({
+      next: () => {
+        this.usuarios.update(list => [...list, {
+          id:               this.nextId++,
+          cedula:           payload.cedula,
+          primerNombre:     payload.primerNombre,
+          segundoNombre:    payload.segundoNombre,
+          primerApellido:   payload.primerApellido,
+          segundoApellido:  payload.segundoApellido,
+          correo:           payload.correo,
+          fechaNacimiento:  payload.fechaNacimiento,
+          idEstado:         payload.idEstado,
+          idMetodoPagoPref: payload.idMetodoPagoPref,
+        }]);
+        this.cerrarModal();
+      },
+      error: err => console.error('Error al crear usuario', err),
+    });
   }
 
   eliminar(id: number) {
