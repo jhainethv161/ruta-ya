@@ -90,6 +90,12 @@ export class ViajeService {
     });
   }
 
+  eliminarViaje(codigo: number): Observable<string> {
+    return this.http.delete(`${this.url}/${codigo}`, {
+      responseType: 'text',
+    });
+  }
+
   getEstados(): Observable<CatalogoItemDescripcion[]> {
     return this.http.get<CatalogoItemDescripcion[]>(this.estadosUrl, {
       headers: { Accept: 'application/json' },

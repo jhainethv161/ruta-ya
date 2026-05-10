@@ -154,7 +154,10 @@ export class Viajes implements OnInit {
   }
 
   eliminar(codigo: number) {
-    this.viajes.update(list => list.filter(x => x.codigo !== codigo));
+    this.viajeService.eliminarViaje(codigo).subscribe({
+      next: () => this.cargar(),
+      error: err => console.error('Error al eliminar viaje', err),
+    });
   }
 
   private cargarCatalogos() {
