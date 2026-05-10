@@ -9,9 +9,17 @@ export interface VehiculoApi {
   idTipo: number;
 }
 
+export interface CatalogoItem {
+  id: number;
+  nombre: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class VehiculoService {
-  private readonly url = 'http://localhost:8080/vehiculos';
+  private readonly baseUrl   = 'http://localhost:8080';
+  private readonly url       = `${this.baseUrl}/vehiculos`;
+  private readonly marcasUrl = `${this.baseUrl}/marcas`;
+  private readonly tiposUrl  = `${this.baseUrl}/tipos-vehiculo`;
 
   constructor(private http: HttpClient) {}
 
@@ -25,6 +33,18 @@ export class VehiculoService {
     return this.http.post(this.url, vehiculo, {
       headers: { 'Content-Type': 'application/json' },
       responseType: 'text',
+    });
+  }
+
+  getMarcas(): Observable<CatalogoItem[]> {
+    return this.http.get<CatalogoItem[]>(this.marcasUrl, {
+      headers: { Accept: 'application/json' },
+    });
+  }
+
+  getTipos(): Observable<CatalogoItem[]> {
+    return this.http.get<CatalogoItem[]>(this.tiposUrl, {
+      headers: { Accept: 'application/json' },
     });
   }
 }

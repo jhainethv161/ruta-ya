@@ -1,42 +1,20 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
 import { ButtonComponent }     from '../../components/atoms/button/button';
 import { IconButtonComponent } from '../../components/atoms/icon-button/icon-button';
 import { FormFieldComponent }  from '../../components/molecules/form-field/form-field';
-import { VehiculoApi, VehiculoService } from '../../services/vehiculo.service';
+import { CatalogoItem, VehiculoApi, VehiculoService } from '../../services/vehiculo.service';
 
 interface Vehiculo {
-  placa:  string;
-  modelo: string;
-  marca:  string;
-  tipo:   string;
+  placa:   string;
+  modelo:  string;
+  marca:   string;
+  tipo:    string;
+  idMarca: number;
+  idTipo:  number;
 }
-
-const MARCAS: Record<number, string> = {
-  1: 'Chevrolet',
-  2: 'Renault',
-  3: 'Honda',
-  4: 'Toyota',
-  5: 'Mazda',
-  6: 'Kia',
-  7: 'AKT',
-};
-
-const TIPOS: Record<number, string> = {
-  1: 'Sedán',
-  2: 'Moto',
-  3: 'Campero',
-  4: 'Camioneta',
-};
-
-const ID_MARCA: Record<string, number> = {
-  'Chevrolet': 1, 'Renault': 2, 'Honda': 3, 'Toyota': 4, 'Mazda': 5, 'Kia': 6, 'AKT': 7,
-};
-
-const ID_TIPO: Record<string, number> = {
-  'Sedán': 1, 'Moto': 2, 'Campero': 3, 'Camioneta': 4,
-};
 
 @Component({
   selector: 'app-vehiculos',
@@ -52,6 +30,8 @@ const ID_TIPO: Record<string, number> = {
 export class Vehiculos implements OnInit {
 
   vehiculos    = signal<Vehiculo[]>([]);
+  marcas       = signal<CatalogoItem[]>([]);
+  tipos        = signal<CatalogoItem[]>([]);
   modalAbierto = signal(false);
   modoEdicion  = signal(false);
   guardando    = signal(false);
@@ -59,22 +39,27 @@ export class Vehiculos implements OnInit {
   private placaEditando = '';
 
   form = new FormGroup({
-    placa:  new FormControl(''),
-    modelo: new FormControl(''),
-    marca:  new FormControl('Chevrolet'),
-    tipo:   new FormControl('Sedán'),
+    placa:   new FormControl(''),
+    modelo:  new FormControl(''),
+    idMarca: new FormControl<number | null>(null),
+    idTipo:  new FormControl<number | null>(null),
   });
 
   constructor(private vehiculoService: VehiculoService) {}
 
   ngOnInit() {
-    this.cargar();
+    this.cargarCatalogos();
   }
 
   abrirModal() {
     this.modoEdicion.set(false);
     this.placaEditando = '';
-    this.form.reset({ marca: 'Chevrolet', tipo: 'Sedán' });
+    this.form.reset({
+      placa:   '',
+      modelo:  '',
+      idMarca: this.marcas()[0]?.id ?? null,
+      idTipo:  this.tipos()[0]?.id  ?? null,
+    });
     this.modalAbierto.set(true);
   }
 
@@ -85,19 +70,24 @@ export class Vehiculos implements OnInit {
   editar(v: Vehiculo) {
     this.modoEdicion.set(true);
     this.placaEditando = v.placa;
-    this.form.setValue({ placa: v.placa, modelo: v.modelo, marca: v.marca, tipo: v.tipo });
+    this.form.setValue({
+      placa:   v.placa,
+      modelo:  v.modelo,
+      idMarca: v.idMarca,
+      idTipo:  v.idTipo,
+    });
     this.modalAbierto.set(true);
   }
 
-  guardar():void {
+  guardar(): void {
     if (this.guardando()) return;
 
     const formulario = this.form.value;
     const payload: VehiculoApi = {
       placa:   this.modoEdicion() ? this.placaEditando : formulario.placa!,
       modelo:  formulario.modelo!,
-      idMarca: ID_MARCA[formulario.marca!],
-      idTipo:  ID_TIPO[formulario.tipo!],
+      idMarca: formulario.idMarca!,
+      idTipo:  formulario.idTipo!,
     };
 
     this.guardando.set(true);
@@ -119,16 +109,34 @@ export class Vehiculos implements OnInit {
   }
 
   private cargar() {
+    const marcas = this.marcas();
+    const tipos  = this.tipos();
     this.vehiculoService.getVehiculos().subscribe({
       next: data => {
         this.vehiculos.set(data.map(v => ({
-          placa:  v.placa,
-          modelo: v.modelo,
-          marca:  MARCAS[v.idMarca] ?? `Marca ${v.idMarca}`,
-          tipo:   TIPOS[v.idTipo]   ?? `Tipo ${v.idTipo}`,
+          placa:   v.placa,
+          modelo:  v.modelo,
+          marca:   marcas.find(m => m.id === v.idMarca)?.nombre ?? `Marca ${v.idMarca}`,
+          tipo:    tipos.find(t => t.id === v.idTipo)?.nombre   ?? `Tipo ${v.idTipo}`,
+          idMarca: v.idMarca,
+          idTipo:  v.idTipo,
         })));
       },
       error: err => console.error('Error al cargar vehículos', err),
+    });
+  }
+
+  private cargarCatalogos() {
+    forkJoin({
+      marcas: this.vehiculoService.getMarcas(),
+      tipos:  this.vehiculoService.getTipos(),
+    }).subscribe({
+      next: ({ marcas, tipos }) => {
+        this.marcas.set(marcas);
+        this.tipos.set(tipos);
+        this.cargar();
+      },
+      error: err => console.error('Error al cargar catálogos', err),
     });
   }
 }
