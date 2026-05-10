@@ -77,19 +77,27 @@
         <h2 class="text-lg font-bold text-[#1f2937] border-b border-[#f59e0b] pb-2">
           {{ modoEdicion() ? 'Editar Viaje' : 'Nuevo Viaje' }}
         </h2>
-        <app-form-field id="fechaHora"       label="Fecha y Hora"      type="datetime-local" placeholder="" [control]="form.controls['fechaHora']" />
-        <app-form-field id="valorEstimado"   label="Valor Estimado"    type="number" placeholder="Ej: 15000"    [control]="form.controls['valorEstimado']" />
-        <app-form-field id="cedulaUsuario"   label="Cédula Usuario"    placeholder="Ej: 1001234567"             [control]="form.controls['cedulaUsuario']" />
-        <app-form-field id="cedulaConductor" label="Cédula Conductor"  placeholder="Ej: 2001111111"             [control]="form.controls['cedulaConductor']" />
-        <app-form-field id="placaVehiculo"   label="Placa Vehículo"    placeholder="Ej: ABC123"                 [control]="form.controls['placaVehiculo']" />
+        <app-form-field id="fechaHora"     label="Fecha y Hora"   type="datetime-local" placeholder="" [control]="form.controls['fechaHora']" />
+        <app-form-field id="valorEstimado" label="Valor Estimado" type="number" placeholder="Ej: 15000" [control]="form.controls['valorEstimado']" />
+        <app-form-field id="cedulaUsuario" label="Cédula Usuario" placeholder="Ej: 1001234567"          [control]="form.controls['cedulaUsuario']" />
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-[#1f2937]">Vehículo - Conductor</label>
+          <select [formControl]="form.controls['asignacion']"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f59e0b]">
+            @for (a of asignaciones(); track a.placaVehiculo + '|' + a.cedulaConductor) {
+              <option [ngValue]="a">
+                {{ a.placaVehiculo }} — {{ a.cedulaConductor }}{{ a.disponible ? '' : ' (no disponible)' }}
+              </option>
+            }
+          </select>
+        </div>
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-[#1f2937]">Estado</label>
           <select [formControl]="form.controls['estado']"
             class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f59e0b]">
-            <option value="Pendiente">Pendiente</option>
-            <option value="En curso">En curso</option>
-            <option value="Completado">Completado</option>
-            <option value="Cancelado">Cancelado</option>
+            @for (e of estados(); track e.id) {
+              <option [value]="e.nombre">{{ e.nombre }}</option>
+            }
           </select>
         </div>
         <div class="flex justify-end gap-3 pt-2">

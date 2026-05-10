@@ -14,14 +14,41 @@ export interface ViajeApi {
   placaVehiculo:      string;
 }
 
+export interface CatalogoItemDescripcion {
+  id:          number;
+  nombre:      string;
+  descripcion: string;
+}
+
+export interface VehiculoConductorApi {
+  cedulaConductor: string;
+  placaVehiculo:   string;
+  disponible:      boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ViajeService {
-  private readonly url = 'http://localhost:8080/viajes';
+  private readonly baseUrl              = 'http://localhost:8080';
+  private readonly url                  = `${this.baseUrl}/viajes`;
+  private readonly estadosUrl           = `${this.baseUrl}/estados-viaje`;
+  private readonly vehiculoConductorUrl = `${this.baseUrl}/vehiculo-conductor`;
 
   constructor(private http: HttpClient) {}
 
   getViajes(): Observable<ViajeApi[]> {
     return this.http.get<ViajeApi[]>(this.url, {
+      headers: { Accept: 'application/json' },
+    });
+  }
+
+  getEstados(): Observable<CatalogoItemDescripcion[]> {
+    return this.http.get<CatalogoItemDescripcion[]>(this.estadosUrl, {
+      headers: { Accept: 'application/json' },
+    });
+  }
+
+  getVehiculoConductor(): Observable<VehiculoConductorApi[]> {
+    return this.http.get<VehiculoConductorApi[]>(this.vehiculoConductorUrl, {
       headers: { Accept: 'application/json' },
     });
   }
