@@ -56,6 +56,12 @@ export class SuscripcionService {
     });
   }
 
+  eliminarSuscripcion(codigo: number): Observable<string> {
+    return this.http.delete(`${this.url}/${codigo}`, {
+      responseType: 'text',
+    });
+  }
+
   getTipos(): Observable<CatalogoItemDescripcion[]> {
     return this.http.get<CatalogoItemDescripcion[]>(this.tiposUrl, {
       headers: { Accept: 'application/json' },

@@ -107,7 +107,10 @@ export class Suscripciones implements OnInit {
   }
 
   eliminar(codigo: number) {
-    this.suscripciones.update(list => list.filter(s => s.codigo !== codigo));
+    this.suscripcionService.eliminarSuscripcion(codigo).subscribe({
+      next: () => this.cargar(),
+      error: err => console.error('Error al eliminar suscripción', err),
+    });
   }
 
   private cargarCatalogos() {
