@@ -8,6 +8,7 @@ import { IconButtonComponent } from '../../components/atoms/icon-button/icon-but
 import { FormFieldComponent }  from '../../components/molecules/form-field/form-field';
 import {
   CatalogoItemDescripcion,
+  CiudadApi,
   VehiculoConductorApi,
   ViajeService,
 } from '../../services/viaje.service';
@@ -39,6 +40,7 @@ export class Viajes implements OnInit {
   viajes       = signal<Viaje[]>([]);
   estados      = signal<CatalogoItemDescripcion[]>([]);
   asignaciones = signal<VehiculoConductorApi[]>([]);
+  ciudades     = signal<CiudadApi[]>([]);
 
   modalAbierto = signal(false);
   modoEdicion  = signal(false);
@@ -52,6 +54,16 @@ export class Viajes implements OnInit {
     estado:        new FormControl(''),
     cedulaUsuario: new FormControl(''),
     asignacion:    new FormControl<VehiculoConductorApi | null>(null),
+    direccionOrigen: new FormGroup({
+      direccion:    new FormControl(''),
+      descripcion:  new FormControl(''),
+      codigoCiudad: new FormControl(''),
+    }),
+    direccionDestino: new FormGroup({
+      direccion:    new FormControl(''),
+      descripcion:  new FormControl(''),
+      codigoCiudad: new FormControl(''),
+    }),
   });
 
   constructor(private viajeService: ViajeService) {}
@@ -70,6 +82,8 @@ export class Viajes implements OnInit {
       estado:        this.estados()[0]?.nombre ?? '',
       cedulaUsuario: '',
       asignacion:    this.asignaciones()[0] ?? null,
+      direccionOrigen:  { direccion: '', descripcion: '', codigoCiudad: '' },
+      direccionDestino: { direccion: '', descripcion: '', codigoCiudad: '' },
     });
     this.modalAbierto.set(true);
   }
@@ -90,6 +104,8 @@ export class Viajes implements OnInit {
       estado:        v.estado,
       cedulaUsuario: v.cedulaUsuario,
       asignacion,
+      direccionOrigen:  { direccion: '', descripcion: '', codigoCiudad: '' },
+      direccionDestino: { direccion: '', descripcion: '', codigoCiudad: '' },
     });
     this.modalAbierto.set(true);
   }
@@ -113,18 +129,39 @@ export class Viajes implements OnInit {
             }
           : x
       ));
-    } else {
-      this.viajes.update(list => [...list, {
-        codigo:          this.nextCodigo++,
-        fechaHora:       v.fechaHora!,
-        valorEstimado:   Number(v.valorEstimado),
-        estado:          v.estado!,
-        cedulaUsuario:   v.cedulaUsuario!,
-        cedulaConductor,
-        placaVehiculo,
-      }]);
+      this.cerrarModal();
+      return;
     }
-    this.cerrarModal();
+
+    const idEstado = this.estados().find(e => e.nombre === v.estado)?.id;
+    if (idEstado == null || !cedulaConductor || !placaVehiculo) {
+      console.error('Faltan datos para crear el viaje', v);
+      return;
+    }
+
+    this.viajeService.crearViaje({
+      valorEstimado:   Number(v.valorEstimado),
+      idEstado,
+      cedulaUsuario:   v.cedulaUsuario!,
+      cedulaConductor,
+      placaVehiculo,
+      direccionOrigen: {
+        direccion:    v.direccionOrigen?.direccion    ?? '',
+        descripcion:  v.direccionOrigen?.descripcion  ?? '',
+        codigoCiudad: v.direccionOrigen?.codigoCiudad ?? '',
+      },
+      direccionDestino: {
+        direccion:    v.direccionDestino?.direccion    ?? '',
+        descripcion:  v.direccionDestino?.descripcion  ?? '',
+        codigoCiudad: v.direccionDestino?.codigoCiudad ?? '',
+      },
+    }).subscribe({
+      next: () => {
+        this.cerrarModal();
+        this.cargar();
+      },
+      error: err => console.error('Error al crear viaje', err),
+    });
   }
 
   eliminar(codigo: number) {
@@ -135,10 +172,12 @@ export class Viajes implements OnInit {
     forkJoin({
       estados:      this.viajeService.getEstados(),
       asignaciones: this.viajeService.getVehiculoConductor(),
+      ciudades:     this.viajeService.getCiudades(),
     }).subscribe({
-      next: ({ estados, asignaciones }) => {
+      next: ({ estados, asignaciones, ciudades }) => {
         this.estados.set(estados);
         this.asignaciones.set(asignaciones);
+        this.ciudades.set(ciudades);
         this.cargar();
       },
       error: err => console.error('Error al cargar catálogos', err),
