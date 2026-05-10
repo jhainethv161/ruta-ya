@@ -8,6 +8,19 @@ export interface CatalogoItemDescripcion {
   descripcion: string;
 }
 
+export interface UsuarioApi {
+  cedula:           string;
+  primerNombre:     string;
+  segundoNombre:    string;
+  primerApellido:   string;
+  segundoApellido:  string;
+  correo:           string;
+  contrasena:       string;
+  fechaNacimiento:  string;
+  idEstado:         number;
+  idMetodoPagoPref: number;
+}
+
 export interface CrearUsuarioApi {
   cedula:           string;
   primerNombre:     string;
@@ -29,6 +42,12 @@ export class UsuarioService {
   private readonly metodosPagoUrl = `${this.baseUrl}/metodos-pago`;
 
   constructor(private http: HttpClient) {}
+
+  getUsuarios(): Observable<UsuarioApi[]> {
+    return this.http.get<UsuarioApi[]>(this.url, {
+      headers: { Accept: 'application/json' },
+    });
+  }
 
   getEstados(): Observable<CatalogoItemDescripcion[]> {
     return this.http.get<CatalogoItemDescripcion[]>(this.estadosUrl, {

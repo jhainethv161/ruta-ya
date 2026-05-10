@@ -37,41 +37,7 @@ export class Usuario implements OnInit {
   estados     = signal<CatalogoItemDescripcion[]>([]);
   metodosPago = signal<CatalogoItemDescripcion[]>([]);
 
-  usuarios = signal<UsuarioItem[]>([
-    {
-      cedula: '1234567890',
-      primerNombre: 'Juan',
-      segundoNombre: 'Carlos',
-      primerApellido: 'Pérez',
-      segundoApellido: 'García',
-      correo: 'juan.perez@email.com',
-      fechaNacimiento: '1990-05-15',
-      idEstado: 1,
-      idMetodoPagoPref: 1,
-    },
-    {
-      cedula: '0987654321',
-      primerNombre: 'Laura',
-      segundoNombre: 'María',
-      primerApellido: 'Torres',
-      segundoApellido: 'López',
-      correo: 'laura.torres@email.com',
-      fechaNacimiento: '1995-08-22',
-      idEstado: 1,
-      idMetodoPagoPref: 2,
-    },
-    {
-      cedula: '1122334455',
-      primerNombre: 'Carlos',
-      segundoNombre: '',
-      primerApellido: 'Ríos',
-      segundoApellido: 'Mora',
-      correo: 'carlos.rios@email.com',
-      fechaNacimiento: '1988-11-30',
-      idEstado: 2,
-      idMetodoPagoPref: 3,
-    },
-  ]);
+  usuarios = signal<UsuarioItem[]>([]);
 
   modalAbierto = signal(false);
   modoEdicion  = signal(false);
@@ -96,6 +62,7 @@ export class Usuario implements OnInit {
 
   ngOnInit() {
     this.cargarCatalogos();
+    this.cargar();
   }
 
   getNombreEstado(id: number): string {
@@ -114,6 +81,7 @@ export class Usuario implements OnInit {
       next: ({ estados, metodosPago }) => {
         this.estados.set(estados);
         this.metodosPago.set(metodosPago);
+        this.cargar();
       },
       error: err => console.error('Error al cargar catálogos', err),
     });
@@ -192,21 +160,29 @@ export class Usuario implements OnInit {
 
     this.usuarioService.crearUsuario(payload).subscribe({
       next: () => {
-        this.usuarios.update(list => [...list, {
-          id:               this.nextId++,
-          cedula:           payload.cedula,
-          primerNombre:     payload.primerNombre,
-          segundoNombre:    payload.segundoNombre,
-          primerApellido:   payload.primerApellido,
-          segundoApellido:  payload.segundoApellido,
-          correo:           payload.correo,
-          fechaNacimiento:  payload.fechaNacimiento,
-          idEstado:         payload.idEstado,
-          idMetodoPagoPref: payload.idMetodoPagoPref,
-        }]);
         this.cerrarModal();
+        this.cargar();
       },
       error: err => console.error('Error al crear usuario', err),
+    });
+  }
+
+  private cargar() {
+    this.usuarioService.getUsuarios().subscribe({
+      next: data => {
+        this.usuarios.set(data.map(u => ({
+          cedula:           u.cedula,
+          primerNombre:     u.primerNombre,
+          segundoNombre:    u.segundoNombre,
+          primerApellido:   u.primerApellido,
+          segundoApellido:  u.segundoApellido,
+          correo:           u.correo,
+          fechaNacimiento:  u.fechaNacimiento,
+          idEstado:         u.idEstado,
+          idMetodoPagoPref: u.idMetodoPagoPref,
+        })));
+      },
+      error: err => console.error('Error al cargar usuarios', err),
     });
   }
 
