@@ -9,7 +9,6 @@ import { FormFieldComponent }  from '../../components/molecules/form-field/form-
 import { CatalogoItemDescripcion, CrearUsuarioApi, UsuarioService } from '../../services/usuario.service';
 
 interface UsuarioItem {
-  id: number;
   cedula: string;
   primerNombre: string;
   segundoNombre: string;
@@ -40,7 +39,6 @@ export class Usuario implements OnInit {
 
   usuarios = signal<UsuarioItem[]>([
     {
-      id: 1,
       cedula: '1234567890',
       primerNombre: 'Juan',
       segundoNombre: 'Carlos',
@@ -52,7 +50,6 @@ export class Usuario implements OnInit {
       idMetodoPagoPref: 1,
     },
     {
-      id: 2,
       cedula: '0987654321',
       primerNombre: 'Laura',
       segundoNombre: 'María',
@@ -64,7 +61,6 @@ export class Usuario implements OnInit {
       idMetodoPagoPref: 2,
     },
     {
-      id: 3,
       cedula: '1122334455',
       primerNombre: 'Carlos',
       segundoNombre: '',
@@ -80,7 +76,7 @@ export class Usuario implements OnInit {
   modalAbierto = signal(false);
   modoEdicion  = signal(false);
 
-  private idEditando: number | null = null;
+  private idEditando: string | null = null;
   private nextId = 4;
 
   form = new FormGroup({
@@ -141,7 +137,7 @@ export class Usuario implements OnInit {
 
   editar(u: UsuarioItem) {
     this.modoEdicion.set(true);
-    this.idEditando  = u.id;
+    this.idEditando  = u.cedula;
     this.form.setValue({
       cedula:           u.cedula,
       primerNombre:     u.primerNombre,
@@ -161,7 +157,7 @@ export class Usuario implements OnInit {
     const v = this.form.value;
     if (this.modoEdicion()) {
       this.usuarios.update(list => list.map(u =>
-        u.id === this.idEditando
+        u.cedula === this.idEditando
           ? {
               ...u,
               cedula:           v.cedula!,
@@ -213,7 +209,7 @@ export class Usuario implements OnInit {
     });
   }
 
-  eliminar(id: number) {
-    this.usuarios.update(list => list.filter(u => u.id !== id));
+  eliminar(cedula: string) {
+    this.usuarios.update(list => list.filter(u => u.cedula !== cedula));
   }
 }
