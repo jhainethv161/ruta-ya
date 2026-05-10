@@ -20,7 +20,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (s of suscripciones; track s.codigo) {
+        @for (s of suscripciones(); track s.codigo) {
           <tr class="border-t border-gray-100 hover:bg-amber-50 transition-colors">
             <td class="px-4 py-3 font-medium text-[#1f2937]">{{ s.codigo }}</td>
             <td class="px-4 py-3 text-[#6b7280]">{{ s.tipo }}</td>
@@ -63,11 +63,11 @@
     </table>
   </div>
 
-  @if (modalAbierto) {
+  @if (modalAbierto()) {
     <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 flex flex-col gap-4">
         <h2 class="text-lg font-bold text-[#1f2937] border-b border-[#f59e0b] pb-2">
-          {{ modoEdicion ? 'Editar Suscripción' : 'Nueva Suscripción' }}
+          {{ modoEdicion() ? 'Editar Suscripción' : 'Nueva Suscripción' }}
         </h2>
         <app-form-field id="cedulaUsuario" label="Cédula Usuario" placeholder="Ej: 1001234567" [control]="form.controls['cedulaUsuario']" />
         <div class="flex flex-col gap-1">
@@ -94,7 +94,7 @@
             Cancelar
           </button>
           <app-button (click)="guardar()">
-            {{ modoEdicion ? 'Guardar cambios' : 'Crear suscripción' }}
+            {{ modoEdicion() ? 'Guardar cambios' : 'Crear suscripción' }}
           </app-button>
         </div>
       </div>
