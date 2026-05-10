@@ -122,6 +122,7 @@ export class Viajes implements OnInit {
     }
 
     const payload = {
+      fechaHora:     v.fechaHora ?? '',
       valorEstimado: Number(v.valorEstimado),
       idEstado,
       cedulaUsuario: v.cedulaUsuario!,

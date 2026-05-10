@@ -39,6 +39,7 @@ export interface DireccionApi {
 }
 
 export interface CrearViajeApi {
+  fechaHora:        string;
   valorEstimado:    number;
   idEstado:         number;
   cedulaUsuario:    string;
@@ -49,6 +50,7 @@ export interface CrearViajeApi {
 }
 
 export interface ActualizarViajeApi {
+  fechaHora:        string;
   valorEstimado:    number;
   idEstado:         number;
   cedulaUsuario:    string;
