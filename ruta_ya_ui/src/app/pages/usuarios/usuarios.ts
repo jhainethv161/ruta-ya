@@ -191,6 +191,9 @@ export class Usuario implements OnInit {
   }
 
   eliminar(cedula: string) {
-    this.usuarios.update(list => list.filter(u => u.cedula !== cedula));
+    this.usuarioService.eliminarUsuario(cedula).subscribe({
+      next: () => this.cargar(),
+      error: err => console.error('Error al eliminar usuario', err),
+    });
   }
 }

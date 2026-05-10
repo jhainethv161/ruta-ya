@@ -86,4 +86,10 @@ export class UsuarioService {
       responseType: 'text',
     });
   }
+
+  eliminarUsuario(cedula: string): Observable<string> {
+    return this.http.delete(`${this.url}/${cedula}`, {
+      responseType: 'text',
+    });
+  }
 }
