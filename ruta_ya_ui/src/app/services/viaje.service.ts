@@ -48,6 +48,16 @@ export interface CrearViajeApi {
   direccionDestino: DireccionApi;
 }
 
+export interface ActualizarViajeApi {
+  valorEstimado:    number;
+  idEstado:         number;
+  cedulaUsuario:    string;
+  cedulaConductor:  string;
+  placaVehiculo:    string;
+  direccionOrigen:  DireccionApi;
+  direccionDestino: DireccionApi;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ViajeService {
   private readonly baseUrl              = 'http://localhost:8080';
@@ -66,6 +76,13 @@ export class ViajeService {
 
   crearViaje(viaje: CrearViajeApi): Observable<string> {
     return this.http.post(this.url, viaje, {
+      headers: { 'Content-Type': 'application/json' },
+      responseType: 'text',
+    });
+  }
+
+  actualizarViaje(codigo: number, viaje: ActualizarViajeApi): Observable<string> {
+    return this.http.put(`${this.url}/${codigo}`, viaje, {
       headers: { 'Content-Type': 'application/json' },
       responseType: 'text',
     });

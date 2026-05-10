@@ -114,35 +114,17 @@ export class Viajes implements OnInit {
     const v = this.form.value;
     const cedulaConductor = v.asignacion?.cedulaConductor ?? '';
     const placaVehiculo   = v.asignacion?.placaVehiculo   ?? '';
+    const idEstado        = this.estados().find(e => e.nombre === v.estado)?.id;
 
-    if (this.modoEdicion()) {
-      this.viajes.update(list => list.map(x =>
-        x.codigo === this.codigoEditando
-          ? {
-              ...x,
-              fechaHora:       v.fechaHora!,
-              valorEstimado:   Number(v.valorEstimado),
-              estado:          v.estado!,
-              cedulaUsuario:   v.cedulaUsuario!,
-              cedulaConductor,
-              placaVehiculo,
-            }
-          : x
-      ));
-      this.cerrarModal();
-      return;
-    }
-
-    const idEstado = this.estados().find(e => e.nombre === v.estado)?.id;
     if (idEstado == null || !cedulaConductor || !placaVehiculo) {
-      console.error('Faltan datos para crear el viaje', v);
+      console.error('Faltan datos para guardar el viaje', v);
       return;
     }
 
-    this.viajeService.crearViaje({
-      valorEstimado:   Number(v.valorEstimado),
+    const payload = {
+      valorEstimado: Number(v.valorEstimado),
       idEstado,
-      cedulaUsuario:   v.cedulaUsuario!,
+      cedulaUsuario: v.cedulaUsuario!,
       cedulaConductor,
       placaVehiculo,
       direccionOrigen: {
@@ -155,12 +137,18 @@ export class Viajes implements OnInit {
         descripcion:  v.direccionDestino?.descripcion  ?? '',
         codigoCiudad: v.direccionDestino?.codigoCiudad ?? '',
       },
-    }).subscribe({
+    };
+
+    const peticion$ = this.modoEdicion()
+      ? this.viajeService.actualizarViaje(this.codigoEditando, payload)
+      : this.viajeService.crearViaje(payload);
+
+    peticion$.subscribe({
       next: () => {
         this.cerrarModal();
         this.cargar();
       },
-      error: err => console.error('Error al crear viaje', err),
+      error: err => console.error('Error al guardar viaje', err),
     });
   }
 
