@@ -138,6 +138,7 @@ export class Usuario implements OnInit {
   editar(u: UsuarioItem) {
     this.modoEdicion.set(true);
     this.idEditando  = u.cedula;
+    this.form.controls['cedula'].disable();
     this.form.setValue({
       cedula:           u.cedula,
       primerNombre:     u.primerNombre,
