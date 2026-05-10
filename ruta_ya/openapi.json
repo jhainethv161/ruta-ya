@@ -15,6 +15,7 @@
     { "name": "Usuarios",      "description": "Gestión de usuarios" },
     { "name": "Suscripciones", "description": "Gestión de suscripciones" },
     { "name": "Vehículos",     "description": "Gestión de vehículos" },
+    { "name": "Vehículo-Conductor", "description": "Asignaciones entre vehículos y conductores" },
     { "name": "Viajes",        "description": "Gestión de viajes" },
     { "name": "Catálogo",      "description": "Datos de referencia (estados, tipos, marcas, etc.)" }
   ],
@@ -351,6 +352,28 @@
         "responses": {
           "200": { "description": "Vehículo actualizado exitosamente", "content": { "application/json": { "example": "Vehículo actualizado exitosamente" } } },
           "404": { "description": "Vehículo no encontrado" },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/vehiculo-conductor": {
+      "get": {
+        "tags": ["Vehículo-Conductor"],
+        "summary": "Obtener todas las asignaciones vehículo-conductor",
+        "responses": {
+          "200": {
+            "description": "Lista de asignaciones vehículo-conductor",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/VehiculoConductorResponse" } },
+                "example": [
+                  { "cedulaConductor": "9876543210", "placaVehiculo": "ABC123", "disponible": true },
+                  { "cedulaConductor": "1122334455", "placaVehiculo": "XYZ789", "disponible": false }
+                ]
+              }
+            }
+          },
           "500": { "description": "Error interno del servidor" }
         }
       }
@@ -794,6 +817,15 @@
           "modelo":  { "type": "string" },
           "idMarca": { "type": "integer" },
           "idTipo":  { "type": "integer" }
+        }
+      },
+
+      "VehiculoConductorResponse": {
+        "type": "object",
+        "properties": {
+          "cedulaConductor": { "type": "string" },
+          "placaVehiculo":   { "type": "string" },
+          "disponible":      { "type": "boolean" }
         }
       },
 
