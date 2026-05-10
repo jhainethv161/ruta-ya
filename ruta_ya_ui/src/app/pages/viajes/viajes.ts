@@ -1,10 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
 
 import { ButtonComponent }     from '../../components/atoms/button/button';
 import { IconButtonComponent } from '../../components/atoms/icon-button/icon-button';
 import { FormFieldComponent }  from '../../components/molecules/form-field/form-field';
+import { ViajeService } from '../../services/viaje.service';
 
 interface Viaje {
   codigo:          number;
@@ -28,25 +29,15 @@ interface Viaje {
   ],
   templateUrl: './viajes.html',
 })
-export class Viajes {
+export class Viajes implements OnInit {
 
-  viajes = signal<Viaje[]>([
-    { codigo: 1, fechaHora: '2025-04-10 08:15', valorEstimado: 12500, estado: 'Completado', cedulaUsuario: '1001234567', cedulaConductor: '2001111111', placaVehiculo: 'ABC123' },
-    { codigo: 2, fechaHora: '2025-04-11 17:30', valorEstimado: 18000, estado: 'En curso',   cedulaUsuario: '1002345678', cedulaConductor: '2002222222', placaVehiculo: 'DEF456' },
-    { codigo: 3, fechaHora: '2025-04-12 09:00', valorEstimado: 9500,  estado: 'En curso',   cedulaUsuario: '1003456789', cedulaConductor: '2003333333', placaVehiculo: 'GHI789' },
-    { codigo: 4, fechaHora: '2025-04-13 14:45', valorEstimado: 22000, estado: 'En curso',   cedulaUsuario: '1004567890', cedulaConductor: '2004444444', placaVehiculo: 'JKL012' },
-    { codigo: 5, fechaHora: '2025-04-14 07:20', valorEstimado: 35000, estado: 'En curso',   cedulaUsuario: '1006789012', cedulaConductor: '2005555555', placaVehiculo: 'MNO345' },
-    { codigo: 6, fechaHora: '2025-04-15 11:00', valorEstimado: 14000, estado: 'Completado', cedulaUsuario: '1001234567', cedulaConductor: '2001111111', placaVehiculo: 'ABC123' },
-    { codigo: 7, fechaHora: '2025-04-16 19:00', valorEstimado: 27000, estado: 'En curso',   cedulaUsuario: '1008901234', cedulaConductor: '2002222222', placaVehiculo: 'DEF456' },
-    { codigo: 8, fechaHora: '2025-04-17 06:30', valorEstimado: 11000, estado: 'Cancelado',  cedulaUsuario: '1002345678', cedulaConductor: '2001111111', placaVehiculo: 'ABC123' },
-    { codigo: 9, fechaHora: '2026-05-06 18:17', valorEstimado: 15000, estado: 'Pendiente',  cedulaUsuario: '1001234567', cedulaConductor: '2001111111', placaVehiculo: 'ABC123' },
-  ]);
+  viajes = signal<Viaje[]>([]);
 
   modalAbierto = signal(false);
   modoEdicion  = signal(false);
 
   private codigoEditando = 0;
-  private nextCodigo     = 10;
+  private nextCodigo     = 1;
 
   form = new FormGroup({
     fechaHora:       new FormControl(''),
@@ -56,6 +47,12 @@ export class Viajes {
     cedulaConductor: new FormControl(''),
     placaVehiculo:   new FormControl(''),
   });
+
+  constructor(private viajeService: ViajeService) {}
+
+  ngOnInit() {
+    this.cargar();
+  }
 
   abrirModal() {
     this.modoEdicion.set(false);
@@ -114,5 +111,23 @@ export class Viajes {
 
   eliminar(codigo: number) {
     this.viajes.update(list => list.filter(x => x.codigo !== codigo));
+  }
+
+  private cargar() {
+    this.viajeService.getViajes().subscribe({
+      next: data => {
+        this.viajes.set(data.map(v => ({
+          codigo:          v.codigo,
+          fechaHora:       v.fechaHora,
+          valorEstimado:   v.valorEstimado,
+          estado:          `Estado ${v.idEstado}`,
+          cedulaUsuario:   v.cedulaUsuario,
+          cedulaConductor: v.cedulaConductor,
+          placaVehiculo:   v.placaVehiculo,
+        })));
+        this.nextCodigo = data.reduce((max, v) => Math.max(max, v.codigo), 0) + 1;
+      },
+      error: err => console.error('Error al cargar viajes', err),
+    });
   }
 }
