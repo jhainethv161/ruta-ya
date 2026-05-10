@@ -34,6 +34,18 @@ export interface CrearUsuarioApi {
   idMetodoPagoPref: number;
 }
 
+export interface ActualizarUsuarioApi {
+  primerNombre:     string;
+  segundoNombre:    string;
+  primerApellido:   string;
+  segundoApellido:  string;
+  correo:           string;
+  contrasena:       string;
+  fechaNacimiento:  string;
+  idEstado:         number;
+  idMetodoPagoPref: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
   private readonly baseUrl        = 'http://localhost:8080';
@@ -63,6 +75,13 @@ export class UsuarioService {
 
   crearUsuario(usuario: CrearUsuarioApi): Observable<string> {
     return this.http.post(this.url, usuario, {
+      headers: { 'Content-Type': 'application/json' },
+      responseType: 'text',
+    });
+  }
+
+  actualizarUsuario(cedula: string, usuario: ActualizarUsuarioApi): Observable<string> {
+    return this.http.put(`${this.url}/${cedula}`, usuario, {
       headers: { 'Content-Type': 'application/json' },
       responseType: 'text',
     });

@@ -6,7 +6,7 @@ import { forkJoin } from 'rxjs';
 import { ButtonComponent }     from '../../components/atoms/button/button';
 import { IconButtonComponent } from '../../components/atoms/icon-button/icon-button';
 import { FormFieldComponent }  from '../../components/molecules/form-field/form-field';
-import { CatalogoItemDescripcion, CrearUsuarioApi, UsuarioService } from '../../services/usuario.service';
+import { ActualizarUsuarioApi, CatalogoItemDescripcion, CrearUsuarioApi, UsuarioService } from '../../services/usuario.service';
 
 interface UsuarioItem {
   cedula: string;
@@ -95,6 +95,7 @@ export class Usuario implements OnInit {
   abrirModal() {
     this.modoEdicion.set(false);
     this.idEditando  = null;
+    this.form.controls['cedula'].enable();
     this.form.reset({ idEstado: 1, idMetodoPagoPref: 1 });
     this.modalAbierto.set(true);
   }
@@ -124,24 +125,27 @@ export class Usuario implements OnInit {
 
   guardar() {
     const v = this.form.value;
-    if (this.modoEdicion()) {
-      this.usuarios.update(list => list.map(u =>
-        u.cedula === this.idEditando
-          ? {
-              ...u,
-              cedula:           v.cedula!,
-              primerNombre:     v.primerNombre!,
-              segundoNombre:    v.segundoNombre ?? '',
-              primerApellido:   v.primerApellido!,
-              segundoApellido:  v.segundoApellido ?? '',
-              correo:           v.correo!,
-              fechaNacimiento:  v.fechaNacimiento!,
-              idEstado:         Number(v.idEstado),
-              idMetodoPagoPref: Number(v.idMetodoPagoPref),
-            }
-          : u
-      ));
-      this.cerrarModal();
+
+    if (this.modoEdicion() && this.idEditando) {
+      const payload: ActualizarUsuarioApi = {
+        primerNombre:     v.primerNombre!,
+        segundoNombre:    v.segundoNombre ?? '',
+        primerApellido:   v.primerApellido!,
+        segundoApellido:  v.segundoApellido ?? '',
+        correo:           v.correo!,
+        contrasena:       v.contrasena!,
+        fechaNacimiento:  v.fechaNacimiento!,
+        idEstado:         Number(v.idEstado),
+        idMetodoPagoPref: Number(v.idMetodoPagoPref),
+      };
+
+      this.usuarioService.actualizarUsuario(this.idEditando, payload).subscribe({
+        next: () => {
+          this.cerrarModal();
+          this.cargar();
+        },
+        error: err => console.error('Error al actualizar usuario', err),
+      });
       return;
     }
 
