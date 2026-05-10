@@ -9,6 +9,12 @@ export interface VehiculoApi {
   idTipo: number;
 }
 
+export interface VehiculoUpdateApi {
+  modelo: string;
+  idMarca: number;
+  idTipo: number;
+}
+
 export interface CatalogoItem {
   id: number;
   nombre: string;
@@ -31,6 +37,13 @@ export class VehiculoService {
 
   crearVehiculo(vehiculo: VehiculoApi): Observable<string> {
     return this.http.post(this.url, vehiculo, {
+      headers: { 'Content-Type': 'application/json' },
+      responseType: 'text',
+    });
+  }
+
+  actualizarVehiculo(placa: string, vehiculo: VehiculoUpdateApi): Observable<string> {
+    return this.http.put(`${this.url}/${placa}`, vehiculo, {
       headers: { 'Content-Type': 'application/json' },
       responseType: 'text',
     });

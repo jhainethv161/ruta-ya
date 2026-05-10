@@ -5,7 +5,7 @@ import { forkJoin } from 'rxjs';
 import { ButtonComponent }     from '../../components/atoms/button/button';
 import { IconButtonComponent } from '../../components/atoms/icon-button/icon-button';
 import { FormFieldComponent }  from '../../components/molecules/form-field/form-field';
-import { CatalogoItem, VehiculoApi, VehiculoService } from '../../services/vehiculo.service';
+import { CatalogoItem, VehiculoService } from '../../services/vehiculo.service';
 
 interface Vehiculo {
   placa:   string;
@@ -83,15 +83,23 @@ export class Vehiculos implements OnInit {
     if (this.guardando()) return;
 
     const formulario = this.form.value;
-    const payload: VehiculoApi = {
-      placa:   this.modoEdicion() ? this.placaEditando : formulario.placa!,
-      modelo:  formulario.modelo!,
-      idMarca: formulario.idMarca!,
-      idTipo:  formulario.idTipo!,
-    };
+    const enEdicion  = this.modoEdicion();
+
+    const peticion$ = enEdicion
+      ? this.vehiculoService.actualizarVehiculo(this.placaEditando, {
+          modelo:  formulario.modelo!,
+          idMarca: formulario.idMarca!,
+          idTipo:  formulario.idTipo!,
+        })
+      : this.vehiculoService.crearVehiculo({
+          placa:   formulario.placa!,
+          modelo:  formulario.modelo!,
+          idMarca: formulario.idMarca!,
+          idTipo:  formulario.idTipo!,
+        });
 
     this.guardando.set(true);
-    this.vehiculoService.crearVehiculo(payload).subscribe({
+    peticion$.subscribe({
       next: () => {
         this.guardando.set(false);
         this.cerrarModal();
