@@ -82,8 +82,8 @@ public interface ReporteRepository extends JpaRepository<Usuario, String> {
             value = """
                         SELECT
                             C.CEDULA AS cedula,
-                            CONCAT(C.PRIMER_NOMBRE, ' ', C.SEGUNDO_NOMBRE) AS nombres,
-                            CONCAT(C.PRIMER_APELLIDO, ' ', C.SEGUNDO_APELLIDO) AS apellidos,
+                            CONCAT(U.PRIMER_NOMBRE, ' ', U.SEGUNDO_NOMBRE) AS nombres,
+                            CONCAT(U.PRIMER_APELLIDO, ' ', U.SEGUNDO_APELLIDO) AS apellidos,
                             VC.PLACA_VEHICULO AS placaVehiculo,
                             COUNT(*) AS numeroViajes
                         FROM USUARIO U
