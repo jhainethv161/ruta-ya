@@ -61,6 +61,46 @@ public class ReporteExcelController {
         }
     }
 
+    // REPORTES INTERMEDIOS
+
+    @GetMapping("/viajes-conductor-vehiculo")
+    public ResponseEntity<?> obtenerViajesConductorVehiculo(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+            @RequestParam int cantidadViajes) {
+        try {
+            ByteArrayInputStream reporte = reportesService.obtenerViajesConductorVehiculo(fechaInicio, fechaFin, cantidadViajes);
+            return armarRespuestaReporte(reporte, "viajes_conductor_vehiculo_" + fechaInicio + "_" + fechaFin);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/recaudo-metodo-pago")
+    public ResponseEntity<?> obtenerRecaudoMetodoPago(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+        try {
+            ByteArrayInputStream reporte = reportesService.obtenerRecaudoMetodoPago(fechaInicio, fechaFin);
+            return armarRespuestaReporte(reporte, "recaudo_metodo_pago_" + fechaInicio + "_" + fechaFin);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/usuarios-viajes-mayores-valor")
+    public ResponseEntity<?> obtenerUsuariosViajesMayoresValor(@RequestParam double valor) {
+        try {
+            ByteArrayInputStream reporte = reportesService.obtenerUsuariosViajesMayoresValor(valor);
+            return armarRespuestaReporte(reporte, "usuarios_viajes_mayores_valor_" + valor);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     private ResponseEntity<InputStreamResource> armarRespuestaReporte(ByteArrayInputStream reporte, String nombreReporte) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + nombreReporte + ".xlsx")
