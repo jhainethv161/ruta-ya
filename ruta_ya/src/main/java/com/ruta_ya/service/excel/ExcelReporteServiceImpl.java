@@ -1,7 +1,10 @@
 package com.ruta_ya.service.excel;
 
+import com.ruta_ya.dto.response.reporte.ConductorViajesPromedioReporte;
+import com.ruta_ya.dto.response.reporte.MetodoPagoMenosUsadoReporte;
 import com.ruta_ya.dto.response.reporte.PagoComisionMayorReporte;
 import com.ruta_ya.dto.response.reporte.RecaudoMetodoPagoReporte;
+import com.ruta_ya.dto.response.reporte.UsuarioPagoPromedioReporte;
 import com.ruta_ya.dto.response.reporte.UsuarioReporte;
 import com.ruta_ya.dto.response.reporte.ViajeRangoFechasReporte;
 import com.ruta_ya.dto.response.reporte.ViajesConductorVehiculoReporte;
@@ -113,5 +116,49 @@ public class ExcelReporteServiceImpl {
                 );
 
         return excelReporteService.generarExcel("UsuariosViajesMayoresValor", columnas, datos);
+    }
+
+    // REPORTES AVANZADOS
+
+    public ByteArrayInputStream obtenerConductoresMasViajesQuePromedio(LocalDate fechaInicio, LocalDate fechaFin) throws IOException {
+
+        List<ConductorViajesPromedioReporte> datos = reportesService.obtenerConductoresConMasViajesQuePromedio(fechaInicio, fechaFin);
+
+        List<ExcelColumn<ConductorViajesPromedioReporte>> columnas =
+                List.of(
+                        new ExcelColumn<>("Cedula del conductor", ConductorViajesPromedioReporte::getCedulaConductor),
+                        new ExcelColumn<>("Placa del vehiculo", ConductorViajesPromedioReporte::getPlacaVehiculo),
+                        new ExcelColumn<>("Total de viajes", ConductorViajesPromedioReporte::getTotalViajes)
+                );
+
+        return excelReporteService.generarExcel("ConductoresMasViajesPromedio", columnas, datos);
+    }
+
+    public ByteArrayInputStream obtenerUsuariosPagoMayorQuePromedio(LocalDate fechaInicio, LocalDate fechaFin) throws IOException {
+
+        List<UsuarioPagoPromedioReporte> datos = reportesService.obtenerUsuariosConPagoMayoresQuePromedio(fechaInicio, fechaFin);
+
+        List<ExcelColumn<UsuarioPagoPromedioReporte>> columnas =
+                List.of(
+                        new ExcelColumn<>("Cedula", UsuarioPagoPromedioReporte::getCedula),
+                        new ExcelColumn<>("Nombres", UsuarioPagoPromedioReporte::getNombres),
+                        new ExcelColumn<>("Apellidos", UsuarioPagoPromedioReporte::getApellidos),
+                        new ExcelColumn<>("Total pagado", UsuarioPagoPromedioReporte::getTotalPagado)
+                );
+
+        return excelReporteService.generarExcel("UsuariosPagoMayorPromedio", columnas, datos);
+    }
+
+    public ByteArrayInputStream obtenerMetodosPagoMenosUsados(LocalDate fechaInicio, LocalDate fechaFin) throws IOException {
+
+        List<MetodoPagoMenosUsadoReporte> datos = reportesService.obtenerMetodosPagoMenosUsados(fechaInicio, fechaFin);
+
+        List<ExcelColumn<MetodoPagoMenosUsadoReporte>> columnas =
+                List.of(
+                        new ExcelColumn<>("Metodo de pago", MetodoPagoMenosUsadoReporte::getMetodoPago),
+                        new ExcelColumn<>("Cantidad de usos", MetodoPagoMenosUsadoReporte::getCantidadUsos)
+                );
+
+        return excelReporteService.generarExcel("MetodosPagoMenosUsados", columnas, datos);
     }
 }

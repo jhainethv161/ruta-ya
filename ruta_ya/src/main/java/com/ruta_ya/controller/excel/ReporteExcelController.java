@@ -101,6 +101,47 @@ public class ReporteExcelController {
         }
     }
 
+    // REPORTES AVANZADOS
+
+    @GetMapping("/conductores-mas-viajes-promedio")
+    public ResponseEntity<?> obtenerConductoresMasViajesQuePromedio(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+        try {
+            ByteArrayInputStream reporte = reportesService.obtenerConductoresMasViajesQuePromedio(fechaInicio, fechaFin);
+            return armarRespuestaReporte(reporte, "conductores_mas_viajes_promedio_" + fechaInicio + "_" + fechaFin);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/usuarios-pago-mayor-promedio")
+    public ResponseEntity<?> obtenerUsuariosPagoMayorQuePromedio(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+        try {
+            ByteArrayInputStream reporte = reportesService.obtenerUsuariosPagoMayorQuePromedio(fechaInicio, fechaFin);
+            return armarRespuestaReporte(reporte, "usuarios_pago_mayor_promedio_" + fechaInicio + "_" + fechaFin);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/metodos-pago-menos-usados")
+    public ResponseEntity<?> obtenerMetodosPagoMenosUsados(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+        try {
+            ByteArrayInputStream reporte = reportesService.obtenerMetodosPagoMenosUsados(fechaInicio, fechaFin);
+            return armarRespuestaReporte(reporte, "metodos_pago_menos_usados_" + fechaInicio + "_" + fechaFin);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     private ResponseEntity<InputStreamResource> armarRespuestaReporte(ByteArrayInputStream reporte, String nombreReporte) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + nombreReporte + ".xlsx")
