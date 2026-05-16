@@ -202,6 +202,7 @@ public class ExcelReporteServiceImpl {
     public ByteArrayInputStream obtenerConductoresMasViajesQuePromedio(LocalDate fechaInicio, LocalDate fechaFin) throws IOException {
 
         List<ConductorViajesPromedioReporte> datos = reportesService.obtenerConductoresConMasViajesQuePromedio(fechaInicio, fechaFin);
+        List<ConductorViajesPromedioReporte> datosGenerales = reportesService.obtenerCantidadViajesConductores(fechaInicio, fechaFin);
 
         List<ExcelColumn<ConductorViajesPromedioReporte>> columnas =
                 List.of(
@@ -225,7 +226,7 @@ public class ExcelReporteServiceImpl {
         estilizarGraficaCategoria(grafica, renderer);
 
         // Línea de promedio
-        double promedio = datos.stream()
+        double promedio = datosGenerales.stream()
                 .mapToLong(ConductorViajesPromedioReporte::getTotalViajes)
                 .average()
                 .orElse(0);

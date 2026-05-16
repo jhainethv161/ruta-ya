@@ -111,4 +111,14 @@ public class ReportesService {
             throw new RuntimeException("Error al obtener los métodos de pago menos usados");
         }
     }
+
+    public List<ConductorViajesPromedioReporte> obtenerCantidadViajesConductores(LocalDate fechaInicio,
+                                                                                          LocalDate fechaFin) {
+        try {
+            return reporteRepository.obtenerCantidadViajesConductores(fechaInicio, fechaFin);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al obtener los conductores con más viajes que el promedio");
+        }
+    }
 }

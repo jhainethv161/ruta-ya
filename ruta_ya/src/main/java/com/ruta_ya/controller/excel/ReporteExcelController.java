@@ -41,7 +41,7 @@ public class ReporteExcelController {
     public ResponseEntity<?> obtenerPagosComisionMayor(@RequestParam double porcentaje) {
         try {
             ByteArrayInputStream reporte = reportesService.obtenerPagosComisionMayor(porcentaje);
-            return armarRespuestaReporte(reporte, "pagos_comidion_mayor_" + porcentaje);
+            return armarRespuestaReporte(reporte, "pagos_comision_mayor_" + porcentaje);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

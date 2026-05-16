@@ -213,4 +213,19 @@ public interface ReporteRepository extends JpaRepository<Usuario, String> {
     List<MetodoPagoMenosUsadoReporte> ObtenerMetodosPagoMenosUsados(@Param("fechaInicio") LocalDate fechaInicio,
                                                                     @Param("fechaFin") LocalDate fechaFin);
 
+
+    @Query(
+            nativeQuery = true,
+            value = """
+                        SELECT
+                            V.CEDULA_CONDUCTOR AS cedulaConductor,
+                            V.PLACA_VEHICULO AS placaVehiculo,
+                            COUNT(V.CODIGO) AS totalViajes
+                        FROM VIAJE V
+                        WHERE V.FECHA_HORA BETWEEN :fechaInicio AND :fechaFin
+                        GROUP BY V.CEDULA_CONDUCTOR, V.PLACA_VEHICULO
+                    """
+    )
+    List<ConductorViajesPromedioReporte> obtenerCantidadViajesConductores(@Param("fechaInicio") LocalDate fechaInicio,
+                                                                           @Param("fechaFin") LocalDate fechaFin);
 }
