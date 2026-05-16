@@ -12,9 +12,17 @@ import com.ruta_ya.service.ReportesService;
 import lombok.RequiredArgsConstructor;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ValueMarker;
+import org.jfree.chart.block.BlockBorder;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.chart.ui.RectangleAnchor;
 import org.jfree.chart.ui.TextAnchor;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -23,8 +31,11 @@ import org.springframework.stereotype.Service;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.Paint;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +47,20 @@ public class ExcelReporteServiceImpl {
 
     private final ExcelReporteService excelReporteService;
     private final ReportesService reportesService;
+
+    // Paleta de colores
+    private static final Color COLOR_AMBAR = Color.decode("#f59e0b");
+    private static final Color COLOR_ROJO = Color.decode("#ff5757");
+    private static final Color COLOR_GRIS = Color.decode("#6b7280");
+    private static final Color COLOR_OSCURO = Color.decode("#1f2937");
+    private static final Color COLOR_GRID = new Color(0xE5, 0xE7, 0xEB);
+    private static final Color[] PALETA = { COLOR_AMBAR, COLOR_ROJO, COLOR_GRIS, COLOR_OSCURO };
+
+    // Tipografía
+    private static final Font FUENTE_TITULO = new Font("SansSerif", Font.BOLD, 16);
+    private static final Font FUENTE_EJE = new Font("SansSerif", Font.PLAIN, 12);
+    private static final Font FUENTE_ETIQUETA = new Font("SansSerif", Font.PLAIN, 11);
+    private static final Font FUENTE_MARCADOR = new Font("SansSerif", Font.BOLD, 11);
 
     // REPORTES SIMPLES
 
@@ -86,17 +111,28 @@ public class ExcelReporteServiceImpl {
         Map<String, Long> porClasificacion = datos.stream()
                 .collect(Collectors.groupingBy(ViajeRangoFechasReporte::getClasificacionCosto, Collectors.counting()));
 
+        List<String> orden = List.of("Económico", "Intermedio", "Costoso");
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        List.of("Económico", "Intermedio", "Costoso").forEach(c ->
-                dataset.addValue(porClasificacion.getOrDefault(c, 0L), "Viajes", c)
-        );
+        orden.forEach(c -> dataset.addValue(porClasificacion.getOrDefault(c, 0L), "Viajes", c));
 
         JFreeChart grafica = ChartFactory.createBarChart(
                 "Viajes por Clasificación de Costo", "Clasificación", "Cantidad de Viajes",
                 dataset, PlotOrientation.VERTICAL, false, true, false
         );
 
-        return excelReporteService.generarExcelConGrafica("ViajesRangoFecha", columnas, datos, grafica);
+        // Cada barra con un color semántico: gris (económico), ámbar (intermedio), rojo (costoso)
+        final Color[] coloresClasificacion = { COLOR_GRIS, COLOR_AMBAR, COLOR_ROJO };
+        BarRenderer renderer = new BarRenderer() {
+            @Override
+            public Paint getItemPaint(int row, int column) {
+                return coloresClasificacion[column % coloresClasificacion.length];
+            }
+        };
+        estilizarGraficaCategoria(grafica, renderer);
+
+        return excelReporteService.generarExcelConGrafica(
+                "ViajesRangoFecha", columnas, datos, grafica, 750, 500
+        );
     }
 
     // REPORTES INTERMEDIOS
@@ -138,7 +174,13 @@ public class ExcelReporteServiceImpl {
                 "Recaudo por Método de Pago", dataset, true, true, false
         );
 
-        return excelReporteService.generarExcelConGrafica("RecaudoMetodoPago", columnas, datos, grafica);
+        estilizarGraficaPie(grafica, dataset);
+
+        // Tamaño proporcional al número de métodos (mín 700, +60 px por cada uno extra de 3)
+        int ancho = Math.max(700, 700 + Math.max(0, datos.size() - 3) * 60);
+        return excelReporteService.generarExcelConGrafica(
+                "RecaudoMetodoPago", columnas, datos, grafica, ancho, 520
+        );
     }
 
     public ByteArrayInputStream obtenerUsuariosViajesMayoresValor(double valor) throws IOException {
@@ -178,22 +220,41 @@ public class ExcelReporteServiceImpl {
                 dataset, PlotOrientation.VERTICAL, false, true, false
         );
 
+        BarRenderer renderer = new BarRenderer();
+        renderer.setSeriesPaint(0, COLOR_AMBAR);
+        estilizarGraficaCategoria(grafica, renderer);
+
+        // Línea de promedio
         double promedio = datos.stream()
                 .mapToLong(ConductorViajesPromedioReporte::getTotalViajes)
                 .average()
                 .orElse(0);
 
         ValueMarker marker = new ValueMarker(promedio);
-        marker.setPaint(Color.RED);
-        marker.setStroke(new BasicStroke(2.0f));
+        marker.setPaint(COLOR_ROJO);
+        marker.setStroke(new BasicStroke(
+                2.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0f,
+                new float[]{8f, 4f}, 0f
+        ));
         marker.setLabel(String.format("Promedio: %.1f", promedio));
+        marker.setLabelFont(FUENTE_MARCADOR);
+        marker.setLabelPaint(COLOR_ROJO);
         marker.setLabelAnchor(RectangleAnchor.TOP_RIGHT);
         marker.setLabelTextAnchor(TextAnchor.BOTTOM_RIGHT);
 
         CategoryPlot plot = grafica.getCategoryPlot();
         plot.addRangeMarker(marker);
 
-        return excelReporteService.generarExcelConGrafica("ConductoresMasViajesPromedio", columnas, datos, grafica);
+        // Etiquetas del eje X rotadas si hay muchos conductores
+        if (datos.size() > 6) {
+            plot.getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_45);
+        }
+
+        // Tamaño proporcional: ~80 px por conductor, con un piso y techo
+        int ancho = Math.min(1800, Math.max(750, 250 + datos.size() * 80));
+        return excelReporteService.generarExcelConGrafica(
+                "ConductoresMasViajesPromedio", columnas, datos, grafica, ancho, 520
+        );
     }
 
     public ByteArrayInputStream obtenerUsuariosPagoMayorQuePromedio(LocalDate fechaInicio, LocalDate fechaFin) throws IOException {
@@ -222,5 +283,77 @@ public class ExcelReporteServiceImpl {
                 );
 
         return excelReporteService.generarExcel("MetodosPagoMenosUsados", columnas, datos);
+    }
+
+    // ===== ESTILOS =====
+
+    private void estilizarGraficaCategoria(JFreeChart grafica, BarRenderer renderer) {
+        grafica.setBackgroundPaint(Color.WHITE);
+        grafica.getTitle().setFont(FUENTE_TITULO);
+        grafica.getTitle().setPaint(COLOR_OSCURO);
+
+        renderer.setBarPainter(new StandardBarPainter());
+        renderer.setShadowVisible(false);
+        renderer.setDrawBarOutline(false);
+        renderer.setItemMargin(0.08);
+
+        CategoryPlot plot = grafica.getCategoryPlot();
+        plot.setRenderer(renderer);
+        plot.setBackgroundPaint(Color.WHITE);
+        plot.setOutlineVisible(false);
+        plot.setDomainGridlinesVisible(false);
+        plot.setRangeGridlinePaint(COLOR_GRID);
+        plot.setRangeGridlineStroke(new BasicStroke(1.0f));
+
+        CategoryAxis xAxis = plot.getDomainAxis();
+        xAxis.setLabelFont(FUENTE_EJE);
+        xAxis.setTickLabelFont(FUENTE_ETIQUETA);
+        xAxis.setAxisLinePaint(COLOR_GRIS);
+        xAxis.setTickLabelPaint(COLOR_OSCURO);
+        xAxis.setLabelPaint(COLOR_OSCURO);
+
+        NumberAxis yAxis = (NumberAxis) plot.getRangeAxis();
+        yAxis.setLabelFont(FUENTE_EJE);
+        yAxis.setTickLabelFont(FUENTE_ETIQUETA);
+        yAxis.setAxisLinePaint(COLOR_GRIS);
+        yAxis.setTickLabelPaint(COLOR_OSCURO);
+        yAxis.setLabelPaint(COLOR_OSCURO);
+    }
+
+    private void estilizarGraficaPie(JFreeChart grafica, DefaultPieDataset<String> dataset) {
+        grafica.setBackgroundPaint(Color.WHITE);
+        grafica.getTitle().setFont(FUENTE_TITULO);
+        grafica.getTitle().setPaint(COLOR_OSCURO);
+
+        @SuppressWarnings("unchecked")
+        PiePlot<String> plot = (PiePlot<String>) grafica.getPlot();
+        plot.setBackgroundPaint(Color.WHITE);
+        plot.setOutlineVisible(false);
+        plot.setShadowPaint(null);
+        plot.setLabelBackgroundPaint(Color.WHITE);
+        plot.setLabelOutlinePaint(COLOR_GRID);
+        plot.setLabelShadowPaint(null);
+        plot.setLabelFont(FUENTE_ETIQUETA);
+        plot.setLabelPaint(COLOR_OSCURO);
+
+        // Etiqueta de cada porción: "Nombre: porcentaje%"
+        plot.setLabelGenerator(new StandardPieSectionLabelGenerator(
+                "{0}: {2}",
+                new DecimalFormat("0"),
+                new DecimalFormat("0.0%")
+        ));
+
+        // Colorear cada porción usando la paleta
+        List<String> claves = dataset.getKeys();
+        for (int i = 0; i < claves.size(); i++) {
+            plot.setSectionPaint(claves.get(i), PALETA[i % PALETA.length]);
+        }
+
+        if (grafica.getLegend() != null) {
+            grafica.getLegend().setBackgroundPaint(Color.WHITE);
+            grafica.getLegend().setItemFont(FUENTE_ETIQUETA);
+            grafica.getLegend().setItemPaint(COLOR_OSCURO);
+            grafica.getLegend().setFrame(BlockBorder.NONE);
+        }
     }
 }

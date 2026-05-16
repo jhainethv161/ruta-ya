@@ -20,6 +20,9 @@ import java.util.List;
 @Service
 public class ExcelReporteService {
 
+    private static final int PX_POR_COLUMNA = 64;
+    private static final int PX_POR_FILA = 20;
+
     public <T> ByteArrayInputStream generarExcel(String nombreHoja,
                                                  List<ExcelColumn<T>> columnas,
                                                  List<T> datos) throws IOException {
@@ -31,10 +34,12 @@ public class ExcelReporteService {
     public <T> ByteArrayInputStream generarExcelConGrafica(String nombreHoja,
                                                            List<ExcelColumn<T>> columnas,
                                                            List<T> datos,
-                                                           JFreeChart grafica) throws IOException {
+                                                           JFreeChart grafica,
+                                                           int anchoPx,
+                                                           int altoPx) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
         llenarHojaDatos(workbook, nombreHoja, columnas, datos);
-        insertarGrafica(workbook, grafica, datos.size() + 3);
+        insertarGrafica(workbook, grafica, datos.size() + 3, anchoPx, altoPx);
         return serializarWorkbook(workbook);
     }
 
@@ -64,14 +69,23 @@ public class ExcelReporteService {
         }
     }
 
-    private void insertarGrafica(XSSFWorkbook workbook, JFreeChart grafica, int filaInicio) throws IOException {
+    private void insertarGrafica(XSSFWorkbook workbook, JFreeChart grafica,
+                                 int filaInicio, int anchoPx, int altoPx) throws IOException {
         ByteArrayOutputStream chartOut = new ByteArrayOutputStream();
-        ChartUtils.writeChartAsPNG(chartOut, grafica, 800, 500);
+        ChartUtils.writeChartAsPNG(chartOut, grafica, anchoPx, altoPx);
         int picIdx = workbook.addPicture(chartOut.toByteArray(), Workbook.PICTURE_TYPE_PNG);
 
         XSSFSheet sheet = workbook.getSheetAt(0);
         XSSFDrawing drawing = sheet.createDrawingPatriarch();
-        XSSFClientAnchor anchor = new XSSFClientAnchor(0, 0, 0, 0, 0, filaInicio, 8, filaInicio + 20);
+
+        int colSpan = (int) Math.ceil((double) anchoPx / PX_POR_COLUMNA);
+        int rowSpan = (int) Math.ceil((double) altoPx / PX_POR_FILA);
+
+        XSSFClientAnchor anchor = new XSSFClientAnchor(
+                0, 0, 0, 0,
+                0, filaInicio,
+                colSpan, filaInicio + rowSpan
+        );
         drawing.createPicture(anchor, picIdx);
     }
 
