@@ -1,7 +1,8 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { CatalogoItemDescripcion, UsuarioService } from '../../services/usuario.service';
+import { ReporteService } from '../../services/reporte.service';
 
 type FiltroTipo = 'date' | 'number' | 'catalog';
 
@@ -111,9 +112,13 @@ export class Reportes implements OnInit {
 
   selectorControl = new FormControl('');
   modalAbierto    = signal(false);
+  cargando        = signal(false);
   form            = new FormGroup<Record<string, FormControl>>({});
 
-  constructor(private usuarioService: UsuarioService) {}
+  constructor(
+    private usuarioService: UsuarioService,
+    private reporteService: ReporteService,
+  ) {}
 
   ngOnInit() {
     this.usuarioService.getEstados().subscribe({
@@ -142,7 +147,7 @@ export class Reportes implements OnInit {
 
     const controls: Record<string, FormControl> = {};
     for (const filtro of reporte.filtros) {
-      controls[filtro.key] = new FormControl('');
+      controls[filtro.key] = new FormControl('', { validators: [Validators.required] });
     }
     this.form = new FormGroup(controls);
     this.modalAbierto.set(true);
@@ -153,6 +158,46 @@ export class Reportes implements OnInit {
   }
 
   aceptar() {
-    // pendiente
+    const reporte = this.reporteActual;
+    if (!reporte || this.form.invalid) return;
+
+    const params = this.form.value as Record<string, string | number>;
+    this.cargando.set(true);
+
+    this.reporteService.descargarExcel(reporte.id, params).subscribe({
+      next: response => {
+        const blob = response.body;
+        if (!blob) {
+          this.cargando.set(false);
+          return;
+        }
+        const filename = this.extraerNombreArchivo(response.headers.get('Content-Disposition'))
+          ?? `${reporte.id}.xlsx`;
+        this.descargarBlob(blob, filename);
+        this.cargando.set(false);
+        this.cerrarModal();
+      },
+      error: err => {
+        console.error('Error al generar el reporte', err);
+        this.cargando.set(false);
+      },
+    });
+  }
+
+  private extraerNombreArchivo(contentDisposition: string | null): string | null {
+    if (!contentDisposition) return null;
+    const match = contentDisposition.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  private descargarBlob(blob: Blob, filename: string) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 }

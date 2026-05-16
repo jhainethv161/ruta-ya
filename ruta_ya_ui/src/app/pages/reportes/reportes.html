@@ -89,12 +89,14 @@
         </form>
 
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" (click)="cerrarModal()"
-            class="px-4 py-2 text-sm rounded-md border border-gray-300 text-[#6b7280] hover:bg-gray-50 transition-colors">
+          <button type="button" (click)="cerrarModal()" [disabled]="cargando()"
+            class="px-4 py-2 text-sm rounded-md border border-gray-300 text-[#6b7280] hover:bg-gray-50 transition-colors disabled:opacity-50">
             Cancelar
           </button>
           <div class="w-32">
-            <app-button (click)="aceptar()">Aceptar</app-button>
+            <app-button (click)="aceptar()" [disabled]="form.invalid || cargando()">
+              {{ cargando() ? 'Generando...' : 'Aceptar' }}
+            </app-button>
           </div>
         </div>
       </div>
