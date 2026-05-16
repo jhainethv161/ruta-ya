@@ -34,4 +34,71 @@
 
   </div>
 
+  @if (modalAbierto() && reporteActual; as reporte) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+        <h2 class="text-lg font-bold text-[#1f2937] border-b border-[#f59e0b] pb-2">
+          {{ reporte.nombre }}
+        </h2>
+
+        <div class="border-l-2 border-[#f59e0b] pl-3">
+          <p class="text-sm text-[#6b7280] leading-relaxed">
+            {{ reporte.descripcion }}
+          </p>
+        </div>
+
+        <form [formGroup]="form" class="flex flex-col gap-4">
+          @for (filtro of reporte.filtros; track filtro.key) {
+            <div class="flex flex-col gap-1">
+              <label [for]="filtro.key" class="text-sm font-medium text-[#1f2937]">
+                {{ filtro.label }}
+              </label>
+
+              @switch (filtro.tipo) {
+                @case ('date') {
+                  <input [id]="filtro.key" type="date" [formControlName]="filtro.key"
+                    class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm
+                           focus:outline-none focus:ring-2 focus:ring-[#f59e0b]" />
+                }
+                @case ('number') {
+                  <input [id]="filtro.key" type="number"
+                    [formControlName]="filtro.key"
+                    [attr.step]="filtro.step ?? null"
+                    [attr.min]="filtro.min ?? null"
+                    [attr.placeholder]="filtro.placeholder ?? null"
+                    class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm
+                           focus:outline-none focus:ring-2 focus:ring-[#f59e0b]" />
+                }
+                @case ('catalog') {
+                  <select [id]="filtro.key" [formControlName]="filtro.key"
+                    class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white
+                           focus:outline-none focus:ring-2 focus:ring-[#f59e0b]">
+                    <option value="">-- Selecciona una opción --</option>
+                    @for (opt of getCatalogo(filtro.catalogo); track opt.id) {
+                      <option [value]="opt.id">{{ opt.nombre }}</option>
+                    }
+                  </select>
+                }
+              }
+
+              @if (filtro.hint) {
+                <span class="text-xs text-[#6b7280]">{{ filtro.hint }}</span>
+              }
+            </div>
+          }
+        </form>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" (click)="cerrarModal()"
+            class="px-4 py-2 text-sm rounded-md border border-gray-300 text-[#6b7280] hover:bg-gray-50 transition-colors">
+            Cancelar
+          </button>
+          <div class="w-32">
+            <app-button (click)="aceptar()">Aceptar</app-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
 </div>
