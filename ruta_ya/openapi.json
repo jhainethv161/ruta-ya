@@ -18,7 +18,8 @@
     { "name": "Vehículo-Conductor", "description": "Asignaciones entre vehículos y conductores" },
     { "name": "Viajes",        "description": "Gestión de viajes" },
     { "name": "Catálogo",      "description": "Datos de referencia (estados, tipos, marcas, etc.)" },
-    { "name": "Reportes",      "description": "Consultas analíticas sobre usuarios, viajes y pagos" }
+    { "name": "Reportes",      "description": "Consultas analíticas sobre usuarios, viajes y pagos" },
+    { "name": "Reportes Excel", "description": "Exportación de reportes en formato Excel (.xlsx)" }
   ],
   "paths": {
 
@@ -948,6 +949,238 @@
                 "example": [
                   { "metodoPago": "Transferencia", "cantidadUsos": 3 }
                 ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/usuarios-por-estado": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar usuarios por estado (Excel)",
+        "description": "Descarga un archivo Excel con la lista de usuarios cuyo estado coincida con el parámetro.",
+        "parameters": [
+          { "name": "estado", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=usuarios_por_estado.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/pagos-comision-mayor": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar pagos con comisión mayor (Excel)",
+        "description": "Descarga un archivo Excel con los pagos cuya comisión de plataforma sea mayor o igual al porcentaje indicado del monto total.",
+        "parameters": [
+          { "name": "porcentaje", "in": "query", "required": true, "schema": { "type": "number", "format": "double" }, "example": 0.15 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=pagos_comidion_mayor_0.15.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/viajes-rango-fechas": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar viajes por rango de fechas (Excel)",
+        "description": "Descarga un archivo Excel con los viajes del rango de fechas indicado, incluyendo su clasificación de costo.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=viajes_fechas_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/viajes-conductor-vehiculo": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar viajes por conductor y vehículo (Excel)",
+        "description": "Descarga un archivo Excel con la cantidad de viajes por conductor y vehículo en el rango de fechas, filtrando por un mínimo de viajes.",
+        "parameters": [
+          { "name": "fechaInicio",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",       "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" },
+          { "name": "cantidadViajes", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 5 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=viajes_conductor_vehiculo_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/recaudo-metodo-pago": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar recaudo por método de pago (Excel)",
+        "description": "Descarga un archivo Excel con el total recaudado y cantidad de pagos agrupados por método de pago en el rango de fechas.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=recaudo_metodo_pago_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/usuarios-viajes-mayores-valor": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar usuarios con viajes por encima de un valor (Excel)",
+        "description": "Descarga un archivo Excel con los usuarios que realizaron al menos un viaje cuyo monto total supera el valor indicado.",
+        "parameters": [
+          { "name": "valor", "in": "query", "required": true, "schema": { "type": "number", "format": "double" }, "example": 30000 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=usuarios_viajes_mayores_valor_30000.0.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/conductores-mas-viajes-promedio": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar conductores con más viajes que el promedio (Excel)",
+        "description": "Descarga un archivo Excel con los conductores cuya cantidad de viajes en el rango de fechas supera el promedio general.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=conductores_mas_viajes_promedio_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/usuarios-pago-mayor-promedio": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar usuarios con pagos sobre el promedio (Excel)",
+        "description": "Descarga un archivo Excel con los usuarios cuya suma de pagos en el rango de fechas supera el promedio de pagos por usuario.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=usuarios_pago_mayor_promedio_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/metodos-pago-menos-usados": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar métodos de pago menos utilizados (Excel)",
+        "description": "Descarga un archivo Excel con el o los métodos de pago con la menor cantidad de usos en el rango de fechas indicado.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=metodos_pago_menos_usados_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
               }
             }
           },
