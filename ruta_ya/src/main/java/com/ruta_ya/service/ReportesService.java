@@ -1,6 +1,7 @@
 package com.ruta_ya.service;
 
 import com.ruta_ya.dto.response.reporte.ConductorViajesPromedioReporte;
+import com.ruta_ya.dto.response.reporte.HistorialViajesConductorReporte;
 import com.ruta_ya.dto.response.reporte.MetodoPagoMenosUsadoReporte;
 import com.ruta_ya.dto.response.reporte.PagoComisionMayorReporte;
 import com.ruta_ya.dto.response.reporte.RecaudoMetodoPagoReporte;
@@ -78,6 +79,15 @@ public class ReportesService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al obtener los usuarios con viajes mayores al valor");
+        }
+    }
+
+    public List<HistorialViajesConductorReporte> obtenerHistorialViajesConductor(String cedula) {
+        try {
+            return reporteRepository.obtenerHistorialViajesConductor(cedula);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al obtener el historial de viajes del conductor");
         }
     }
 

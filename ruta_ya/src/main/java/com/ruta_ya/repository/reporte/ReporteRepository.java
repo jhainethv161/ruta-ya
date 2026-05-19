@@ -1,6 +1,7 @@
 package com.ruta_ya.repository.reporte;
 
 import com.ruta_ya.dto.response.reporte.ConductorViajesPromedioReporte;
+import com.ruta_ya.dto.response.reporte.HistorialViajesConductorReporte;
 import com.ruta_ya.dto.response.reporte.MetodoPagoMenosUsadoReporte;
 import com.ruta_ya.dto.response.reporte.PagoComisionMayorReporte;
 import com.ruta_ya.dto.response.reporte.RecaudoMetodoPagoReporte;
@@ -132,6 +133,34 @@ public interface ReporteRepository extends JpaRepository<Usuario, String> {
                     """
     )
     List<UsuarioReporte> obtenerUsuariosViajesMayoresAValor(@Param("valor") double valor);
+
+    // Obtener el historial de viajes realizados por un conductor (identificado por su cédula),
+    // con detalles del viaje, el usuario, las direcciones y el pago asociado.
+    @Query(
+            nativeQuery = true,
+            value = """
+                        SELECT
+                            V.CODIGO AS codigo,
+                            V.FECHA_HORA AS fechaHora,
+                            V.VALOR_ESTIMADO AS valorEstimado,
+                            EV.NOMBRE AS estadoViaje,
+                            DIR_O.DIRECCION AS direccionOrigen,
+                            DIR_D.DIRECCION AS direccionDestino,
+                            U.CEDULA AS cedulaUsuario,
+                            CONCAT(U.PRIMER_NOMBRE, ' ', U.PRIMER_APELLIDO) AS nombreUsuario,
+                            V.PLACA_VEHICULO AS placaVehiculo,
+                            P.MONTO_TOTAL AS montoTotal
+                        FROM VIAJE V
+                            INNER JOIN ESTADO_VIAJE EV ON V.ID_ESTADO = EV.ID
+                            INNER JOIN DIRECCION DIR_O ON V.ID_DIRECCION_ORIGEN = DIR_O.CODIGO
+                            INNER JOIN DIRECCION DIR_D ON V.ID_DIRECCION_DESTINO = DIR_D.CODIGO
+                            INNER JOIN USUARIO U ON V.CEDULA_USUARIO = U.CEDULA
+                            LEFT JOIN PAGO P ON V.CODIGO = P.CODIGO_VIAJE
+                        WHERE V.CEDULA_CONDUCTOR = :cedula
+                        ORDER BY V.FECHA_HORA DESC
+                    """
+    )
+    List<HistorialViajesConductorReporte> obtenerHistorialViajesConductor(@Param("cedula") String cedula);
 
     // REPORTES AVANZADOS
     //

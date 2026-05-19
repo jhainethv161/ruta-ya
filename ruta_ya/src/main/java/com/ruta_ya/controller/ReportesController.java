@@ -1,6 +1,7 @@
 package com.ruta_ya.controller;
 
 import com.ruta_ya.dto.response.reporte.ConductorViajesPromedioReporte;
+import com.ruta_ya.dto.response.reporte.HistorialViajesConductorReporte;
 import com.ruta_ya.dto.response.reporte.MetodoPagoMenosUsadoReporte;
 import com.ruta_ya.dto.response.reporte.PagoComisionMayorReporte;
 import com.ruta_ya.dto.response.reporte.RecaudoMetodoPagoReporte;
@@ -97,6 +98,17 @@ public class ReportesController {
     public ResponseEntity<?> obtenerUsuariosViajesMayoresAValor(@RequestParam double valor) {
         try {
             List<UsuarioReporte> reporte = reportesService.obtenerUsuariosViajesMayoresAValor(valor);
+            return ResponseEntity.ok(reporte);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/historial-viajes-conductor")
+    public ResponseEntity<?> obtenerHistorialViajesConductor(@RequestParam String cedula) {
+        try {
+            List<HistorialViajesConductorReporte> reporte = reportesService.obtenerHistorialViajesConductor(cedula);
             return ResponseEntity.ok(reporte);
         } catch (Exception e) {
             System.out.println(e.getMessage());
