@@ -1,6 +1,7 @@
 package com.ruta_ya.service.excel;
 
 import com.ruta_ya.dto.response.reporte.ConductorViajesPromedioReporte;
+import com.ruta_ya.dto.response.reporte.HistorialViajesConductorReporte;
 import com.ruta_ya.dto.response.reporte.MetodoPagoMenosUsadoReporte;
 import com.ruta_ya.dto.response.reporte.PagoComisionMayorReporte;
 import com.ruta_ya.dto.response.reporte.RecaudoMetodoPagoReporte;
@@ -195,6 +196,27 @@ public class ExcelReporteServiceImpl {
                 );
 
         return excelReporteService.generarExcel("UsuariosViajesMayoresValor", columnas, datos);
+    }
+
+    public ByteArrayInputStream obtenerHistorialViajesConductor(String cedula) throws IOException {
+
+        List<HistorialViajesConductorReporte> datos = reportesService.obtenerHistorialViajesConductor(cedula);
+
+        List<ExcelColumn<HistorialViajesConductorReporte>> columnas =
+                List.of(
+                        new ExcelColumn<>("Codigo del viaje", HistorialViajesConductorReporte::getCodigo),
+                        new ExcelColumn<>("Fecha y hora", HistorialViajesConductorReporte::getFechaHora),
+                        new ExcelColumn<>("Valor estimado", HistorialViajesConductorReporte::getValorEstimado),
+                        new ExcelColumn<>("Estado del viaje", HistorialViajesConductorReporte::getEstadoViaje),
+                        new ExcelColumn<>("Direccion de origen", HistorialViajesConductorReporte::getDireccionOrigen),
+                        new ExcelColumn<>("Direccion de destino", HistorialViajesConductorReporte::getDireccionDestino),
+                        new ExcelColumn<>("Cedula del usuario", HistorialViajesConductorReporte::getCedulaUsuario),
+                        new ExcelColumn<>("Nombre del usuario", HistorialViajesConductorReporte::getNombreUsuario),
+                        new ExcelColumn<>("Placa del vehiculo", HistorialViajesConductorReporte::getPlacaVehiculo),
+                        new ExcelColumn<>("Monto total", HistorialViajesConductorReporte::getMontoTotal)
+                );
+
+        return excelReporteService.generarExcel("HistorialViajesConductor", columnas, datos);
     }
 
     // REPORTES AVANZADOS

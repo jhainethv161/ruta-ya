@@ -101,6 +101,17 @@ public class ReporteExcelController {
         }
     }
 
+    @GetMapping("/historial-viajes-conductor")
+    public ResponseEntity<?> obtenerHistorialViajesConductor(@RequestParam String cedula) {
+        try {
+            ByteArrayInputStream reporte = reportesService.obtenerHistorialViajesConductor(cedula);
+            return armarRespuestaReporte(reporte, "historial_viajes_conductor_" + cedula);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     // REPORTES AVANZADOS
 
     @GetMapping("/conductores-mas-viajes-promedio")
