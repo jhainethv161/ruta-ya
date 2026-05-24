@@ -4,7 +4,7 @@ import { ButtonComponent } from '../../components/atoms/button/button';
 import { CatalogoItemDescripcion, UsuarioService } from '../../services/usuario.service';
 import { ReporteService } from '../../services/reporte.service';
 
-type FiltroTipo = 'date' | 'number' | 'catalog';
+type FiltroTipo = 'date' | 'number' | 'catalog' | 'text';
 
 interface CatalogoItem {
   id: number;
@@ -86,6 +86,14 @@ export class Reportes implements OnInit {
       descripcion: 'Lista los usuarios que realizaron al menos un viaje cuyo monto total supera el valor indicado.',
       filtros: [
         { key: 'valor', label: 'Valor mínimo del viaje', tipo: 'number', step: '0.01', min: 0, placeholder: 'Ej: 30000' },
+      ],
+    },
+    {
+      id: 'historial-viajes-conductor',
+      nombre: 'Historial de viajes de un conductor',
+      descripcion: 'Descarga el historial completo de viajes realizados por el conductor identificado por la cédula.',
+      filtros: [
+        { key: 'cedula', label: 'Cédula del conductor', tipo: 'text', placeholder: 'Ej: 9876543210' },
       ],
     },
     {
