@@ -99,4 +99,7 @@ public interface UserRepository extends JpaRepository<Usuario, String> {
     """
     )
     UserResponse findByCedula(String cedula);
+
+    @Query(value = "SELECT contrasena FROM USUARIO WHERE correo = :correo", nativeQuery = true)
+    String findContrasenaByCorreo(@Param("correo") String correo);
 }
