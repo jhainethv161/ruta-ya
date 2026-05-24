@@ -17,7 +17,10 @@
     { "name": "Vehículos",     "description": "Gestión de vehículos" },
     { "name": "Vehículo-Conductor", "description": "Asignaciones entre vehículos y conductores" },
     { "name": "Viajes",        "description": "Gestión de viajes" },
-    { "name": "Catálogo",      "description": "Datos de referencia (estados, tipos, marcas, etc.)" }
+    { "name": "Catálogo",      "description": "Datos de referencia (estados, tipos, marcas, etc.)" },
+    { "name": "Reportes",      "description": "Consultas analíticas sobre usuarios, viajes y pagos" },
+    { "name": "Reportes Excel", "description": "Exportación de reportes en formato Excel (.xlsx)" },
+    { "name": "Autenticación", "description": "Autenticación de usuario administrador" }
   ],
   "paths": {
 
@@ -153,6 +156,45 @@
           "200": { "description": "Usuario eliminado exitosamente", "content": { "application/json": { "example": "Usuario eliminado exitosamente" } } },
           "404": { "description": "Usuario no encontrado" },
           "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/auth/login": {
+      "post": {
+        "tags": ["Autenticación"],
+        "summary": "Autenticar administrador",
+        "description": "Autentica al usuario administrador (admin@example.com). Compara correo y contraseña literalmente con el registro en base de datos.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" },
+              "example": {
+                "correo": "admin@example.com",
+                "contrasena": "123456"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Autenticación exitosa",
+            "content": {
+              "application/json": {
+                "schema": { "type": "boolean" },
+                "example": true
+              }
+            }
+          },
+          "400": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "example": "Credenciales inválidas"
+              }
+            }
+          }
         }
       }
     },
@@ -710,6 +752,506 @@
           "500": { "description": "Error interno del servidor" }
         }
       }
+    },
+
+    "/reportes/usuarios-por-estado": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Usuarios por estado",
+        "description": "Lista la cédula, nombres y apellidos de los usuarios cuyo estado coincida con el parámetro.",
+        "parameters": [
+          { "name": "estado", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/UsuarioReporte" } },
+                "example": [
+                  { "cedula": "1234567890", "nombres": "Juan Carlos", "apellidos": "Pérez García" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/pagos-comision-mayor": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Pagos con comisión superior al porcentaje del monto total",
+        "description": "Obtiene los pagos cuya comisión de plataforma sea mayor o igual al porcentaje proporcionado del monto total.",
+        "parameters": [
+          { "name": "porcentaje", "in": "query", "required": true, "schema": { "type": "number", "format": "double" }, "example": 0.15 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de pagos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PagoComisionMayorReporte" } },
+                "example": [
+                  {
+                    "codigo": 10,
+                    "fecha": "2025-03-15",
+                    "montoTotal": 25000.00,
+                    "comisionPlataforma": 5000.00,
+                    "idMetodoPago": 1,
+                    "codigoViaje": 5,
+                    "codigoSuscripcion": 2
+                  }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/viajes-rango-fechas": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Viajes por rango de fechas con clasificación de costo",
+        "description": "Lista los viajes realizados en el rango de fechas indicado y los clasifica como Económico, Intermedio o Costoso según el valor estimado.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de viajes clasificados",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ViajeRangoFechasReporte" } },
+                "example": [
+                  { "codigo": 1, "fechaHora": "2025-02-10T14:30:00", "valorEstimado": 28000.00, "clasificacionCosto": "Costoso" },
+                  { "codigo": 2, "fechaHora": "2025-02-12T08:15:00", "valorEstimado": 18000.00, "clasificacionCosto": "Intermedio" },
+                  { "codigo": 3, "fechaHora": "2025-02-14T19:45:00", "valorEstimado": 12000.00, "clasificacionCosto": "Económico" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/viajes-conductor-vehiculo": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Cantidad de viajes por conductor y vehículo en un rango de fechas",
+        "description": "Lista la cantidad de viajes realizados por cada conductor en cada vehículo, filtrando solo aquellos con al menos la cantidad de viajes indicada.",
+        "parameters": [
+          { "name": "fechaInicio",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",       "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" },
+          { "name": "cantidadViajes", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 5 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de conductores con sus vehículos y número de viajes",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ViajesConductorVehiculoReporte" } },
+                "example": [
+                  { "cedula": "9876543210", "nombres": "Pedro Luis", "apellidos": "Ramírez Soto", "placaVehiculo": "ABC123", "numeroViajes": 12 }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/recaudo-metodo-pago": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Recaudo total por método de pago en un periodo",
+        "description": "Obtiene el total recaudado y la cantidad de pagos agrupados por método de pago en el rango de fechas indicado.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de recaudos por método de pago",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/RecaudoMetodoPagoReporte" } },
+                "example": [
+                  { "id": 1, "nombre": "Efectivo", "cantidadPagos": 42, "recaudo": 1250000.00 },
+                  { "id": 2, "nombre": "Tarjeta",  "cantidadPagos": 18, "recaudo": 540000.00 }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/usuarios-viajes-mayores-valor": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Usuarios con viajes por encima de un valor",
+        "description": "Lista los usuarios que realizaron al menos un viaje cuyo monto total supera el valor indicado.",
+        "parameters": [
+          { "name": "valor", "in": "query", "required": true, "schema": { "type": "number", "format": "double" }, "example": 30000 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/UsuarioReporte" } },
+                "example": [
+                  { "cedula": "1234567890", "nombres": "Juan Carlos", "apellidos": "Pérez García" }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/conductores-mas-viajes-promedio": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Conductores con más viajes que el promedio",
+        "description": "Lista los conductores cuya cantidad de viajes en el rango de fechas supera el promedio general de viajes por conductor.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de conductores destacados",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ConductorViajesPromedioReporte" } },
+                "example": [
+                  { "cedulaConductor": "9876543210", "placaVehiculo": "ABC123", "totalViajes": 25 }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/usuarios-pago-mayor-promedio": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Usuarios con pagos acumulados sobre el promedio",
+        "description": "Lista los usuarios cuya suma de pagos en el rango de fechas supera el promedio de pagos por usuario.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios con pagos sobre el promedio",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/UsuarioPagoPromedioReporte" } },
+                "example": [
+                  { "cedula": "1234567890", "nombres": "Juan Carlos", "apellidos": "Pérez García", "totalPagado": 185000.00 }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/metodos-pago-menos-usados": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Métodos de pago menos utilizados en un periodo",
+        "description": "Devuelve el o los métodos de pago con la menor cantidad de usos en el rango de fechas indicado.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de métodos de pago menos usados",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/MetodoPagoMenosUsadoReporte" } },
+                "example": [
+                  { "metodoPago": "Transferencia", "cantidadUsos": 3 }
+                ]
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/usuarios-por-estado": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar usuarios por estado (Excel)",
+        "description": "Descarga un archivo Excel con la lista de usuarios cuyo estado coincida con el parámetro.",
+        "parameters": [
+          { "name": "estado", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=usuarios_por_estado.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/pagos-comision-mayor": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar pagos con comisión mayor (Excel)",
+        "description": "Descarga un archivo Excel con los pagos cuya comisión de plataforma sea mayor o igual al porcentaje indicado del monto total.",
+        "parameters": [
+          { "name": "porcentaje", "in": "query", "required": true, "schema": { "type": "number", "format": "double" }, "example": 0.15 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=pagos_comidion_mayor_0.15.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/viajes-rango-fechas": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar viajes por rango de fechas (Excel)",
+        "description": "Descarga un archivo Excel con los viajes del rango de fechas indicado, incluyendo su clasificación de costo.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=viajes_fechas_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/viajes-conductor-vehiculo": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar viajes por conductor y vehículo (Excel)",
+        "description": "Descarga un archivo Excel con la cantidad de viajes por conductor y vehículo en el rango de fechas, filtrando por un mínimo de viajes.",
+        "parameters": [
+          { "name": "fechaInicio",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",       "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" },
+          { "name": "cantidadViajes", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 5 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=viajes_conductor_vehiculo_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/recaudo-metodo-pago": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar recaudo por método de pago (Excel)",
+        "description": "Descarga un archivo Excel con el total recaudado y cantidad de pagos agrupados por método de pago en el rango de fechas.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=recaudo_metodo_pago_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/usuarios-viajes-mayores-valor": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar usuarios con viajes por encima de un valor (Excel)",
+        "description": "Descarga un archivo Excel con los usuarios que realizaron al menos un viaje cuyo monto total supera el valor indicado.",
+        "parameters": [
+          { "name": "valor", "in": "query", "required": true, "schema": { "type": "number", "format": "double" }, "example": 30000 }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=usuarios_viajes_mayores_valor_30000.0.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/historial-viajes-conductor": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar historial de viajes de un conductor (Excel)",
+        "description": "Descarga un archivo Excel con el historial completo de viajes realizados por el conductor identificado por la cédula.",
+        "parameters": [
+          { "name": "cedula", "in": "query", "required": true, "schema": { "type": "string" }, "example": "9876543210" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=historial_viajes_conductor_9876543210.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/conductores-mas-viajes-promedio": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar conductores con más viajes que el promedio (Excel)",
+        "description": "Descarga un archivo Excel con los conductores cuya cantidad de viajes en el rango de fechas supera el promedio general.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=conductores_mas_viajes_promedio_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/usuarios-pago-mayor-promedio": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar usuarios con pagos sobre el promedio (Excel)",
+        "description": "Descarga un archivo Excel con los usuarios cuya suma de pagos en el rango de fechas supera el promedio de pagos por usuario.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=usuarios_pago_mayor_promedio_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
+    },
+
+    "/reportes/excel/metodos-pago-menos-usados": {
+      "get": {
+        "tags": ["Reportes Excel"],
+        "summary": "Exportar métodos de pago menos utilizados (Excel)",
+        "description": "Descarga un archivo Excel con el o los métodos de pago con la menor cantidad de usos en el rango de fechas indicado.",
+        "parameters": [
+          { "name": "fechaInicio", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-01-01" },
+          { "name": "fechaFin",    "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-03-31" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado exitosamente",
+            "headers": {
+              "Content-Disposition": { "schema": { "type": "string" }, "example": "attachment; filename=metodos_pago_menos_usados_2025-01-01_2025-03-31.xlsx" }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "500": { "description": "Error interno del servidor" }
+        }
+      }
     }
 
   },
@@ -902,6 +1444,95 @@
           "codigo":              { "type": "string" },
           "nombre":              { "type": "string" },
           "codigoDepartamento":  { "type": "string" }
+        }
+      },
+
+      "UsuarioReporte": {
+        "type": "object",
+        "properties": {
+          "cedula":    { "type": "string" },
+          "nombres":   { "type": "string" },
+          "apellidos": { "type": "string" }
+        }
+      },
+
+      "PagoComisionMayorReporte": {
+        "type": "object",
+        "properties": {
+          "codigo":             { "type": "integer" },
+          "fecha":              { "type": "string", "format": "date" },
+          "montoTotal":         { "type": "number", "format": "decimal" },
+          "comisionPlataforma": { "type": "number", "format": "decimal" },
+          "idMetodoPago":       { "type": "integer" },
+          "codigoViaje":        { "type": "integer" },
+          "codigoSuscripcion":  { "type": "integer" }
+        }
+      },
+
+      "ViajeRangoFechasReporte": {
+        "type": "object",
+        "properties": {
+          "codigo":             { "type": "integer" },
+          "fechaHora":          { "type": "string", "format": "date-time" },
+          "valorEstimado":      { "type": "number", "format": "decimal" },
+          "clasificacionCosto": { "type": "string", "enum": ["Económico", "Intermedio", "Costoso"] }
+        }
+      },
+
+      "ViajesConductorVehiculoReporte": {
+        "type": "object",
+        "properties": {
+          "cedula":        { "type": "string" },
+          "nombres":       { "type": "string" },
+          "apellidos":     { "type": "string" },
+          "placaVehiculo": { "type": "string" },
+          "numeroViajes":  { "type": "integer", "format": "int64" }
+        }
+      },
+
+      "RecaudoMetodoPagoReporte": {
+        "type": "object",
+        "properties": {
+          "id":            { "type": "integer" },
+          "nombre":        { "type": "string" },
+          "cantidadPagos": { "type": "integer", "format": "int64" },
+          "recaudo":       { "type": "number", "format": "decimal" }
+        }
+      },
+
+      "ConductorViajesPromedioReporte": {
+        "type": "object",
+        "properties": {
+          "cedulaConductor": { "type": "string" },
+          "placaVehiculo":   { "type": "string" },
+          "totalViajes":     { "type": "integer", "format": "int64" }
+        }
+      },
+
+      "UsuarioPagoPromedioReporte": {
+        "type": "object",
+        "properties": {
+          "cedula":      { "type": "string" },
+          "nombres":     { "type": "string" },
+          "apellidos":   { "type": "string" },
+          "totalPagado": { "type": "number", "format": "decimal" }
+        }
+      },
+
+      "MetodoPagoMenosUsadoReporte": {
+        "type": "object",
+        "properties": {
+          "metodoPago":   { "type": "string" },
+          "cantidadUsos": { "type": "integer", "format": "int64" }
+        }
+      },
+
+      "LoginRequest": {
+        "type": "object",
+        "required": ["correo", "contrasena"],
+        "properties": {
+          "correo":     { "type": "string", "example": "admin@example.com" },
+          "contrasena": { "type": "string", "example": "123456" }
         }
       }
 

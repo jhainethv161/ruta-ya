@@ -62,4 +62,15 @@ public class UserService {
             throw new RuntimeException("Error al actualizar el usuario");
         }
     }
+
+    public boolean authenticateAdmin(String correo, String contrasena) {
+        if (!"admin@example.com".equals(correo)) {
+            return false;
+        }
+        String storedPassword = userRepository.findContrasenaByCorreo(correo);
+        if (storedPassword == null) {
+            return false;
+        }
+        return storedPassword.equals(contrasena);
+    }
 }

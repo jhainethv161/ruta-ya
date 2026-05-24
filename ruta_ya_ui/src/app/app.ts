@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Navbar } from './components/molecules/navbar/navbar';
 import { SidebarComponent } from './components/organisms/sidebar/sidebar';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,6 @@ import { SidebarComponent } from './components/organisms/sidebar/sidebar';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {}
+export class App {
+  auth = inject(AuthService);
+}
