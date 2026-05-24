@@ -26,12 +26,13 @@
       </div>
 
       <!-- Form -->
-      <div class="space-y-3">
+      <form [formGroup]="form" (ngSubmit)="iniciarSesion()" class="space-y-3">
 
-        <!-- Username -->
+        <!-- Email -->
         <input
-          type="text"
-          placeholder="Nombre de Usuario"
+          formControlName="correo"
+          type="email"
+          placeholder="Correo electrónico"
           class="w-full px-4 py-3.5 rounded-xl border border-[#e5e7eb] text-[#1f2937] placeholder-[#9ca3af] text-sm
                  focus:outline-none focus:border-[#f59e0b] focus:ring-2 focus:ring-[#f59e0b]/20
                  transition-all duration-200 bg-white"
@@ -39,6 +40,7 @@
 
         <!-- Password -->
         <input
+          formControlName="contrasena"
           type="password"
           placeholder="Contraseña"
           class="w-full px-4 py-3.5 rounded-xl border border-[#e5e7eb] text-[#1f2937] placeholder-[#9ca3af] text-sm
@@ -46,29 +48,26 @@
                  transition-all duration-200 bg-white"
         />
 
+        <!-- Error message -->
+        @if (error()) {
+          <p class="text-red-500 text-sm text-center">{{ error() }}</p>
+        }
+
         <!-- Submit button -->
         <button
-          type="button"
+          type="submit"
+          [disabled]="form.invalid || cargando()"
           class="w-full bg-[#f59e0b] hover:bg-[#d97706] active:bg-[#b45309]
                  text-white font-bold py-3.5 rounded-xl text-sm
                  transition-all duration-200 shadow-md hover:shadow-lg
                  transform hover:-translate-y-0.5 active:translate-y-0
+                 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
                  mt-1"
         >
-          Iniciar Sesión
+          {{ cargando() ? 'Ingresando...' : 'Iniciar Sesión' }}
         </button>
 
-      </div>
-
-      <!-- Forgot password -->
-      <div class="text-center mt-5">
-        <a
-          href="#"
-          class="text-[#6b7280] text-sm hover:text-[#f59e0b] transition-colors duration-200"
-        >
-          ¿Olvidaste tu contraseña?
-        </a>
-      </div>
+      </form>
 
     </div>
   </main>
